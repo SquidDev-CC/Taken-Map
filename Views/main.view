@@ -1,0 +1,40 @@
+{
+	Children={
+		{
+			X=1,
+			Y=1,
+			Name="HelloButton",
+			Type="Button",
+			Text="Hello! I'm a Button!",
+			Width="100%,-10",
+		},
+		{
+			X=1,
+			Y=2,
+			Name="TabGroup",
+			Type="TabPanel",
+			Width="100%",
+			Height="100%",
+
+			Children = {
+				{
+					Name="Item",
+					Type="TabItem",
+					Title="Hello!",
+
+					Children = {
+						{
+							X=1,
+							Y=1,
+							Name="Another",
+							Type="Button",
+							Text="Hai!",
+							Width="100%,-10",
+						},
+					}
+				}
+			}
+		}
+	},
+	BackgroundColour='white'
+}

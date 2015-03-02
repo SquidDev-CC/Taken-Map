@@ -1,0 +1,15 @@
+{
+  Type="Menu",
+  Children={
+    {
+      Name="Options.ViewModeMenuItem",
+      Type="Button",
+      Text="List View"
+    },
+    {
+      Name="Options.HiddenFilesMenuItem",
+      Type="Button",
+      Text="Show Hidden"
+    }
+  }
+}
