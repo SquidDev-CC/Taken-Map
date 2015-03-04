@@ -1,0 +1,4 @@
+[submodule "LuaIDE"]
+	path = LuaIDE
+	url = https://github.com/SquidDev-CC/LuaIDE.git
+	branch = taken-editor
