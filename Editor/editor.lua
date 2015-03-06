@@ -47,6 +47,12 @@ end, function()
 	end
 end, function()
 	sleep(30)
+end, function()
+	local f = fs.open(shell.resolve("log.txt"), "w")
+	while true do
+		f.writeLine(textutils.serialize({os.pullEvent()}))
+		f.flush()
+	end
 end)
 
 term.redirect(term.native())
