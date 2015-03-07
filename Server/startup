@@ -1,0 +1,1 @@
+shell.run("build/server.lua")

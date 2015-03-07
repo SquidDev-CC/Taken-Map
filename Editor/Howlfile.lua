@@ -9,8 +9,6 @@ Sources:File "../config.lua"
 Sources:File "LuaIDE/build/api.lua"
 	:Name "IDE"
 
-local apiSource = Sources:CloneDependencies():Export(true)
-
 Tasks:Clean("clean", "build")
 Tasks:Combine("combine", Sources, "build/editor.lua", {"clean"})
 	:Verify()
