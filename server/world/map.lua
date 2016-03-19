@@ -1,4 +1,4 @@
-local config = require "config"
+local config = require "shared.config"
 local blocks = require "server.world.blocks"
 
 local width, height = config.map.width, config.map.height
@@ -29,7 +29,9 @@ return function()
 		if y < 1 or y > height then error("Y coordinate is out of bounds", 2) end
 		if not blocks[kind] then error("No such block " .. kind, 2) end
 
-		data[x][y] = kind
+		local row = data[x]
+		if row[y] ~= "empty" then error("Already a block at " .. x .. ", " .. y) end
+		row[y] = kind
 	end
 
 	function world.count()

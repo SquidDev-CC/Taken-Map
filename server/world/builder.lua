@@ -1,4 +1,4 @@
-local config = require "config"
+local config = require "shared.config"
 local blocks = require "server.world.blocks"
 local command = require "server.world.command"
 
@@ -54,6 +54,7 @@ local function build(map)
 end
 
 local function clear()
+	kill("@e[type=Item]")
 	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, "minecraft:quartz_block")
 	fill(1, config.map.bottom + 1, 1, width, config.map.top, height, "minecraft:air")
 end
@@ -61,8 +62,6 @@ end
 local function setup(map)
 	local entrance = map.entrance
 	tp("@a", entrance[1], config.map.bottom + 1, entrance[2])
-
-	kill("@e[type=Item]")
 	title("@a", "title", {text=map.title})
 	title("@a", "subtitle", {text=map.subtitle})
 end

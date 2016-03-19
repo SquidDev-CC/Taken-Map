@@ -1,8 +1,8 @@
-local config = require "config"
+local config = require "shared.config"
 local command = require "server.world.command"
 
-local setBlock = command("setblock")
-local summon = command("summon", true, true)
+local setBlock = command "setblock"
+local summon = command "summon"
 
 return {
 	lava = {
@@ -32,16 +32,16 @@ return {
 			{
 				Age = -32768, -- No despawn
 				Item = {
-						id = "computercraft:pocketComputer",
-						Damage = 1, -- Force advanced
-						Count = 1,
-						tag = {
-							display = {
-								Name = "Your computer"
-							},
-							computerID = assert(config.clientId),
-							upgrade = 1,
-						}
+					id = "computercraft:pocketComputer",
+					Damage = 1, -- Force advanced
+					Count = 1,
+					tag = {
+						display = {
+							Name = "Your computer"
+						},
+						computerID = assert(config.clientId),
+						upgrade = 1,
+					}
 				}
 			}
 		)

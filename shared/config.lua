@@ -1,6 +1,6 @@
 return {
-	clientId = 0,
-	serverId = 1,
+	clientId = 1,
+	serverId = 0,
 
 	map = {
 		bottom = 64,

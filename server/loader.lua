@@ -1,4 +1,4 @@
-return function(path, name)
+local function parse(path, name)
 	local file = fs.open(path, "r")
 	if not file then error("Cannot find file " .. path, 2) end
 
@@ -30,4 +30,19 @@ return function(path, name)
 		writable = writable,
 		lines = lines,
 	}
+end
+
+local levelDir = fs.combine(fs.getDir(shell.getRunningProgram()), "data")
+if fs.exists(levelDir) then
+	local levelNames = fs.list(levelDir)
+	table.sort(levelNames)
+
+	local levels = {}
+	for i, levelName in ipairs(levelNames) do
+		levels[i] = { parse(fs.combine(levelDir, levelName), levelName) }
+	end
+
+	return levels
+else
+	return require "server.levels"
 end

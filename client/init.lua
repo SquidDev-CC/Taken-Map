@@ -1,5 +1,5 @@
 local original = term.current()
-
+term.redirect(term.native())
 assert(xpcall(
 	function() require "client.loop" end,
 	function(msg)

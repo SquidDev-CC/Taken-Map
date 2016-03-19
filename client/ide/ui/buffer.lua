@@ -313,6 +313,9 @@ return function(tParent, x, y, nWidth, nHeight, bVisible)
 			end
 		end
 
+		local function getTextColor() return 2 ^ tonumber(sTextColor, 16) end
+		local function getBackgroundColor() return 2 ^ tonumber(sBackColor, 16) end
+
 		tRedirect = {
 			getSize             = getSize,
 			getCursorPos        = getCursorPos,
@@ -321,8 +324,12 @@ return function(tParent, x, y, nWidth, nHeight, bVisible)
 			isColour            = isColor,
 			setTextColor        = setTextColor,
 			setTextColour       = setTextColor,
+			getTextColor        = getTextColor,
+			getTextColour       = getTextColor,
 			setBackgroundColor  = setBackgroundColor,
 			setBackgroundColour = setBackgroundColor,
+			getBackgroundColor  = getBackgroundColor,
+			getBackgroundColour = getBackgroundColor,
 			setCursorBlink      = setCursorBlink,
 			clearLine           = clearLine,
 			clear               = clear,

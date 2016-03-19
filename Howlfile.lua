@@ -2,7 +2,7 @@ Options:Default "trace"
 
 local editor = Files()
 	:Include "wild:client/*.lua"
-	:Include "config.lua"
+	:Include "wild:shared/*.lua"
 	:Startup "client/init.lua"
 
 Tasks:Clean("clean", "build")

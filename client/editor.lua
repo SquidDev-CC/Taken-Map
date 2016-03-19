@@ -38,8 +38,8 @@ end
 
 local function getFiles()
 	local files = {}
-	for _, file in pairs(controller.tabBar.contentManager.contents) do
-		files[file.path] = {
+	for i, file in ipairs(controller.tabBar.contentManager.contents) do
+		files[i] = {
 			name = file.path,
 			lines = file.editor.lines,
 		}
@@ -51,5 +51,5 @@ end
 return {
 	getFiles = getFiles,
 	setFiles = setFiles,
-	run = function() controller:run() end
+	run = function() controller:run() end,
 }

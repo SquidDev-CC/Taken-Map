@@ -57,14 +57,19 @@ local function include(path)
 end
 
 include(fs.combine(root, "client"))
-include(fs.combine(root, "config.lua"))
+include(fs.combine(root, "shared"))
 local args = { ... }
 
-local before =term.current()
+local original = term.current()
+term.redirect(term.native())
+
 local success = xpcall(function()
 	preload["client.loop"](unpack(args))
 end, function(err)
-	term.redirect(before)
+	term.redirect(original)
+	term.setCursorPos(1, 1)
+	term.setBackgroundColor(colors.black)
+	term.clear()
 	printError(err)
 	for i = 3, 15 do
 		local _, msg = pcall(error, "", i)

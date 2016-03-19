@@ -1,6 +1,6 @@
 local editor = require "client.editor"
-local network = require "client.network"
-local config = require "config"
+local config = require "shared.config"
+local network = require "shared.network"(config.serverId)
 
 local files = {
 	{
@@ -20,7 +20,6 @@ local files = {
 }
 
 editor.setFiles(files)
-
 network.send({action = "startup"})
 
 parallel.waitForAny(editor.run, function()

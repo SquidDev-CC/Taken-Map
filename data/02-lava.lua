@@ -1,10 +1,11 @@
 --[[
 Lets start simple.
-You need to get to the exit.
-Without dying.
+You need to get to the
+exit.Without dying.
 
-You should only need 6
-characters to solve this.
+You should only need
+6 characters to solve
+this.
 ]]
 
 function generate(world)
@@ -24,4 +25,9 @@ function generate(world)
 --@start
 
 --@stop
+end
+
+function validate(world)
+	assert.eq(1, #world.find("exit"), "exit")
+	assert.eq(1, #world.find("entrance"), "entrance") 
 end

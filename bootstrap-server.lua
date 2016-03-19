@@ -57,7 +57,7 @@ local function include(path)
 end
 
 include(fs.combine(root, "server"))
-include(fs.combine(root, "config.lua"))
+include(fs.combine(root, "shared"))
 
 local args = { ... }
 
