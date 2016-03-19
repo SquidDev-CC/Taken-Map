@@ -308,7 +308,7 @@ end
 
 --- Return true if a line is readonly
 function Editor:isReadOnly(y)
-	return self.readOnly[y or self.cursor.y + self.scroll.y]
+	return self.readOnly[y or (self.cursor.y + self.scroll.y)]
 end
 
 --- Set a line or a range of lines to be readonly

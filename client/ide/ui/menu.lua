@@ -27,11 +27,11 @@ MenuBar.items = {
 		id = "reset",
 	},
 	{
-		name = "\164 Look",
+		name = "\2 Look",
 		id = "spectate",
 	},
 	{
-		name = "Help",
+		name = "?",
 		id = "help",
 		["contents"] = {
 			"Help",
@@ -130,6 +130,10 @@ function MenuBar:open(index)
 	local y = MenuBar.y + 1
 	local height = #item.contents + 2
 	local width = self:itemWidth(index)
+
+	if x + width > self.win.width then
+		x = self.win.width - width + 1
+	end
 
 	-- Create the window
 	local win = Window.new(x, y, width, height, term.native())

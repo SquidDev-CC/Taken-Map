@@ -57,11 +57,12 @@ local function include(path)
 end
 
 include(fs.combine(root, "client"))
+include(fs.combine(root, "config.lua"))
 local args = { ... }
 
 local before =term.current()
 local success = xpcall(function()
-	preload["client"](unpack(args))
+	preload["client.loop"](unpack(args))
 end, function(err)
 	term.redirect(before)
 	printError(err)

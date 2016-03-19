@@ -78,7 +78,7 @@ function Content:restoreCursor()
 
 	term.redirect(self.win.redirect)
 	term.setCursorPos(x, y)
-	if self.editor:isReadOnly(y) then
+	if self.editor:isReadOnly(y + self.editor.scroll.y) then
 		term.setTextColor(Theme["editor readonly"][Theme["editor text"]])
 	else
 		term.setTextColor(Theme["editor text"])
@@ -90,7 +90,7 @@ end
 --- Renders a whole line - gutter and text.
 --- Does not redirect to the terminal.
 function Content:drawLine(y)
-	if self.editor:isReadOnly(y) then
+	if self.editor:isReadOnly(y + self.editor.scroll.y) then
 		term.setBackgroundColor(Theme["editor readonly"][Theme["editor background"]])
 	else
 		term.setBackgroundColor(Theme["editor background"])
@@ -123,7 +123,7 @@ function Content:drawGutter(y)
 	term.write(lineNumber)
 
 	term.setTextColor(back)
-	if self.editor:isReadOnly(y) then
+	if self.editor:isReadOnly(y + self.editor.scroll.y) then
 		term.setBackgroundColor(Theme["editor readonly"][Theme["editor background"]])
 	else
 		term.setBackgroundColor(Theme["editor background"])
@@ -137,7 +137,7 @@ function Content:drawText(y)
 	local absoluteY = y + self.editor.scroll.y
 	local data = self.highlighter:data(absoluteY, self.editor.scroll.x, self.width)
 
-	local isReadOnly = self.editor:isReadOnly(y)
+	local isReadOnly = self.editor:isReadOnly(absoluteY)
 
 	-- Map colours for readonly
 	if isReadOnly then
@@ -282,9 +282,15 @@ function Content:event(event)
 		self:char(event[2])
 	elseif event[1] == "key" then
 		self:key(event[2])
-	elseif event[1] == "mouse_click" or event[1] == "mouse_drag" then
+	elseif event[1] == "mouse_click" then
 		self.editor:moveCursorToRelative(event[3] - self.editor:gutterSize(), event[4])
 		returnVal = true
+	elseif event[1] == "mouse_scroll" then
+		if event[2] == 1 then
+			self.editor:moveCursorDown()
+		else
+			self.editor:moveCursorUp()
+		end
 	end
 
 	self:updateDirty()

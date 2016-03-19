@@ -69,42 +69,6 @@ Theme.load = function()
 
 		-- Invert mapping for colours taken from Bedrock
 		Theme["editor readonly"] = {
-			-- Invert
-			-- [colours.white] = colours.black,
-			-- [colours.orange] = colours.blue,
-			-- [colours.magenta] = colours.green,
-			-- [colours.lightBlue] = colours.brown,
-			-- [colours.yellow] = colours.blue,
-			-- [colours.lime] = colours.purple,
-			-- [colours.pink] = colours.green,
-			-- [colours.grey] = colours.lightGrey,
-			-- [colours.lightGrey] = colours.grey,
-			-- [colours.cyan] = colours.red,
-			-- [colours.purple] = colours.green,
-			-- [colours.blue] = colours.yellow,
-			-- [colours.brown] = colours.lightBlue,
-			-- [colours.green] = colours.purple,
-			-- [colours.red] = colours.cyan,
-			-- [colours.black] = colours.white,
-
-			-- Darker
-			-- [colours.white] = colours.lightGrey,
-			-- [colours.orange] = colours.red,
-			-- [colours.magenta] = colours.purple,
-			-- [colours.lightBlue] = colours.cyan,
-			-- [colours.yellow] = colours.orange,
-			-- [colours.lime] = colours.green,
-			-- [colours.pink] = colours.magenta,
-			-- [colours.grey] = colours.black,
-			-- [colours.lightGrey] = colours.grey,
-			-- [colours.cyan] = colours.blue,
-			-- [colours.purple] = colours.grey,
-			-- [colours.blue] = colours.grey,
-			-- [colours.brown] = colours.grey,
-			-- [colours.green] = colours.grey,
-			-- [colours.red] = colours.brown,
-			-- [colours.black] = colours.black,
-
 			-- Highlight
 			[colours.white] = colours.lightGrey,
 			[colours.orange] = colours.yellow,
@@ -121,7 +85,7 @@ Theme.load = function()
 			[colours.brown] = colours.red,
 			[colours.green] = colours.lime,
 			[colours.red] = colours.orange,
-			[colours.black] = colours.grey,
+			[colours.black] = colours.black,
 		}
 
 		-- Panel

@@ -1,13 +1,12 @@
-local original = term.getCurrent()
+local original = term.current()
 
 assert(xpcall(
-	function() require "client.ide.startup" end,
+	function() require "client.loop" end,
 	function(msg)
 		term.redirect(original)
 		term.setCursorPos(1, 1)
-		term.setBackgroundColor(color.black)
+		term.setBackgroundColor(colors.black)
 		term.clear()
-		print(debug.traceback(msg))
-		return msg
+		if debug then print(debug.traceback(msg)) end
 	end
 ))
