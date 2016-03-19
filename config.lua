@@ -1,24 +1,12 @@
 return {
-	Editor = {
-		Id = 0,
-	},
+	clientId = 0,
+	serverId = 1,
 
-	Server = {
-		Id = 1,
-	},
+	map = {
+		bottom = 64,
+		top = 71,
 
-	World = {
-		Wall = "minecraft:quartz_block 0",
-		Floor = "minecraft:quartz_block 0",
-		Ceiling = "minecraft:stained_glass 0",
-
-		Exit = "minecraft:stained_glass 3"
-	},
-
-	BlockInfo = {
-		Pocket = {
-			Id = 4100,
-			Name = "ComputerCraft:pocket_computer",
-		},
+		width = 24,
+		height = 24,
 	},
 }
