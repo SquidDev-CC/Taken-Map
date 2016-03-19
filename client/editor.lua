@@ -1,4 +1,7 @@
-local controller = IDE.Controller.new()
+local Controller = require "client.ide.controller"
+local Config = require "config"
+
+local controller = Controller.new()
 
 function receive(sender)
 	-- Wait for events
@@ -13,8 +16,6 @@ function receive(sender)
 end
 
 parallel.waitForAny(function()
-	term.redirect(term.native())
-
 	controller.tabBar:current():open("Welcome!", {
 		"--[[",
 		" Welcome to Trapped",
@@ -88,9 +89,3 @@ end, function()
 		end
 	end
 end)
-
-term.redirect(term.native())
-term.setBackgroundColor(colors.black)
-term.setTextColor(colors.white)
-term.clear()
-term.setCursorPos(1, 1)
