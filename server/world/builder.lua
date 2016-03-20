@@ -1,10 +1,11 @@
 local config = require "shared.config"
 local blocks = require "server.world.blocks"
-local command = require "server.world.command"
+local command = require "server.command".wrap
 
 local kill = command "kill"
 local fill = command "fill"
 local tp = command "tp"
+local gamemode = command "gamemode"
 local title = command "title"
 
 local width, height = config.map.width, config.map.height
@@ -29,12 +30,9 @@ local function build(map)
 			end
 
 			local block = blocks[value]
-			local ty = type(block)
-			if ty == "boolean" then
-				-- Do nothing.
-			elseif ty == "function" then
-				block(x, z)
-			else
+			if block.build then
+				block.build(x, z)
+			elseif block.block then
 				previous = value
 				previousRun = previousRun + 1
 			end
@@ -54,13 +52,15 @@ local function build(map)
 end
 
 local function clear()
-	kill("@e[type=Item]")
+	kill("@e[type=!Player]")
 	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, "minecraft:quartz_block")
 	fill(1, config.map.bottom + 1, 1, width, config.map.top, height, "minecraft:air")
 end
 
 local function setup(map)
 	local entrance = map.entrance
+
+	gamemode("adventure", "@a[name=!ThatVeggie]")
 	tp("@a", entrance[1], config.map.bottom + 1, entrance[2])
 	title("@a", "title", {text=map.title})
 	title("@a", "subtitle", {text=map.subtitle})

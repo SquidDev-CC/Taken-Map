@@ -1,6 +1,6 @@
 local sandbox = require "server.sandbox"
 local config = require "shared.config"
-local command = require "server.world.command"
+local command = require "server.command".wrap
 local network = require "shared.network"(config.clientId)
 local levels = require "server.loader"
 

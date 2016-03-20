@@ -27,7 +27,7 @@ return function()
 
 		if x < 1 or x > width then error("X coordinate is out of bounds", 2) end
 		if y < 1 or y > height then error("Y coordinate is out of bounds", 2) end
-		if not blocks[kind] then error("No such block " .. kind, 2) end
+		if kind == "empty" or not blocks[kind] then error("No such block " .. kind, 2) end
 
 		local row = data[x]
 		if row[y] ~= "empty" then error("Already a block at " .. x .. ", " .. y) end

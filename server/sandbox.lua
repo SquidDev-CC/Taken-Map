@@ -1,6 +1,6 @@
 local asserts = require "shared.asserts"
 local builder = require "server.world.builder"
-local command = require "server.world.command"
+local command = require "server.command".wrap
 local map = require "server.world.map"
 local player = require "server.world.player"
 
