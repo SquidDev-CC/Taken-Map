@@ -39,7 +39,8 @@ return {
 	},
 	zombie = {
 		build = function(x, y)
-			summon("Zombie", x, config.map.bottom + 1, y,[=[{Equipment:[{id:"diamond_sword",damage:0,ench:[{id:8,lvl:10}]},{id:"leather_boots",damage:0},{id:"leather_leggings",damage:0},{id:"leather_chestplate",damage:0},{id:"leather_helmet",damage:0}]}]=])
+			-- Slightly OP. Eh.
+			summon("Zombie", x, config.map.bottom + 1, y,[=[{Equipment:[{id:"diamond_sword",damage:0,ench:[{id:8,lvl:20}]},{},{},{},{id:"leather_helmet",damage:0}],Attributes:[{Name:generic.movementSpeed,Base:0.5},{Name:generic.attackDamage,Base:100}]}]=])
 		end
 	},
 	computer = {

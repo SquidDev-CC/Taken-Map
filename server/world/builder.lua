@@ -23,7 +23,7 @@ local function build(map)
 
 				local startY = block.offset + config.map.bottom
 				local finishY = startY + block.height - 1
-				fill(x, startY, z - previousRun + 1, x, finishY, z - 1, block.block)
+				fill(x, startY, z - previousRun, x, finishY, z - 1, block.block)
 
 				previousRun = 0
 				previous = nil
