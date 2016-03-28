@@ -6,6 +6,7 @@ local command = require "server.command".wrap
 local kill = command "kill"
 local fill = command "fill"
 local tp = command "tp"
+local spawnpoint = command "spawnpoint"
 local gamemode = command "gamemode"
 local title = command "title"
 
@@ -47,7 +48,7 @@ end
 
 local function clear()
 	kill("@e[type=!Player]")
-	tp("@a", 2, config.map.top + 2, -2)
+	tp("@a", 2, config.map.bottom + 1, -2)
 	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, "minecraft:quartz_block")
 	fill(1, config.map.bottom + 1, 1, width, config.map.top, height, "minecraft:air")
 end
@@ -57,6 +58,7 @@ local function setup(map)
 
 	gamemode("adventure", "@a[name=!ThatVeggie]")
 	tp("@a", entrance[1], config.map.bottom + 1, entrance[2])
+	spawnpoint("@a", 6, config.map.bottom + 1, -2)
 	title("@a", "title", {text=map.title})
 	title("@a", "subtitle", {text=map.subtitle})
 end

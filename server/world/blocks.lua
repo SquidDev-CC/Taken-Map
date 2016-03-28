@@ -37,7 +37,7 @@ return {
 	},
 	mine = {
 		blocks = { "minecraft:stained_glass 2" },
-		hit = function(world)
+		hit = function(x, y)
 			kill "@a"
 		end,
 	},

@@ -2,10 +2,12 @@ local asserts = require "shared.asserts"
 local builder = require "server.world.builder"
 local command = require "server.command".wrap
 local map = require "server.world.map"
+local blocks = require "server.world.blocks"
 local player = require "server.world.player"
 
 local tellraw = command("tellraw")
-local function say(message) tellraw("@a", {"",{text=message,color="red"}}) end
+local function say(message) tellraw("@a", {"",{text=message,color="white"}}) end
+local function sayError(message) tellraw("@a", {"",{text=message,color="red"}}) end
 
 local function sayPrint(...)
 	local args = { ... }
@@ -13,7 +15,7 @@ local function sayPrint(...)
 		args[i] = tostring(args[i])
 	end
 
-	say(args)
+	say(table.concat(args, " "))
 end
 
 local function copy(table, cache, blacklist)
@@ -82,24 +84,37 @@ return function(files)
 	sleep(0.05)
 	builder.setup(map)
 
-	return function()
+	return function(state)
 		local previousSuccess = false
 		while true do
-			local success, msg = commands.execute("@a", "~", "~", "~", "testforblock", "~", "~-1", "~", "minecraft:stained_glass", "3")
+			-- m=!sp doesn't appear to work.
+			local success, msg = commands.execute("@r[m=a]", "~", "~", "~", "tp", "@p", "~", "~", "~")
 			if success then
-				if backup.exit then
-					local success, msg = pcall(backup.exit, copy(player))
-					if success then
-						break
-					elseif not previousSuccess then
-						say(msg)
+				local x, y, z = msg[1]:match("to ([-%d%.]+), ([-%d%.]+), ([-%d%.]+)")
+				if not x then print("Cannot extract position from " .. msg[1]) end
+
+				x, z = math.floor(x), math.floor(z)
+				local row = map.data[x]
+				if row then
+					local block = row[z]
+					if block == "exit" then
+						if backup.exit then
+							local success, msg = pcall(backup.exit, copy(player))
+							if success then
+								break
+							elseif not previousSuccess then
+								say(msg)
+							end
+							previousSuccess = true
+						else
+							break
+						end
+					elseif block then
+						block = blocks[block]
+						if block and block.hit then block.hit(x, z) end
 					end
-				else
-					break
 				end
 			end
-
-			previousSuccess = success
 		end
 	end
 end

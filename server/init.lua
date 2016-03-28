@@ -20,6 +20,7 @@ while true do
 
 	local files = levelFiles
 
+	local state = { active = true }
 	local function updateFiles()
 		while true do
 			local data = network.receive()
