@@ -1,38 +1,42 @@
 local config = require "shared.config"
 local command = require "server.command".wrap
 
-local setBlock = command "setblock"
-local summon = command("summon", true)
+local summon = command "summon"
 local kill = command "kill"
 
 return {
 	lava = {
-		block = "minecraft:lava",
-		height = 1,
-		offset = 0,
-		decorate = false
+		blocks = { "minecraft:lava" },
+		decorate = false,
 	},
 	wall = {
-		block = "minecraft:iron_bars",
-		height = 2,
-		offset = 1,
+		blocks = {
+			{
+				block = "minecraft:iron_bars",
+				height = 2,
+				offset = 1,
+			},
+		},
 		decorate = true,
 	},
 	entrance = {
 		decorate = true,
 	},
 	exit = {
+		blocks = {
+			{
+				block = "minecraft:beacon",
+				offset = -1,
+			},
+			"minecraft:stained_glass 3",
+		},
 		deocrate = false,
-		build = function(x, y)
-			setBlock(x, config.map.bottom - 1, y, "minecraft:beacon")
-			setBlock(x, config.map.bottom, y, "minecraft:stained_glass 3")
-		end,
 	},
 	empty = {
 		decorate = true,
 	},
 	mine = {
-		block = "minecraft:stained_glass 2",
+		blocks = { "minecraft:stained_glass 2" },
 		hit = function(world)
 			kill "@a"
 		end,
@@ -44,7 +48,7 @@ return {
 		end
 	},
 	computer = {
-		deocrate = true,
+		decorate = true,
 		build = function(x, y)
 			summon(
 				"Item", x, config.map.bottom + 1, y,

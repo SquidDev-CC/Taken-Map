@@ -16,17 +16,6 @@ local function sayPrint(...)
 	say(args)
 end
 
-local function assertEq(expected, actual, message)
-	if expected ~= actual then
-		if message then
-			message = message .. ": "
-		else
-			message = ""
-		end
-		error(message .. "Expected " .. tostring(expected) .. ", got " .. tostring(actual), 0)
-	end
-end
-
 local function copy(table, cache, blacklist)
 	if cache then
 		local val = cache[table]

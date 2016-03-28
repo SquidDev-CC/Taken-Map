@@ -1,5 +1,6 @@
 local config = require "shared.config"
 local blocks = require "server.world.blocks"
+local filler = require "server.world.filler"
 local command = require "server.command".wrap
 
 local kill = command "kill"
@@ -9,50 +10,44 @@ local gamemode = command "gamemode"
 local title = command "title"
 
 local width, height = config.map.width, config.map.height
+local top, bottom = config.map.top, config.map.bottom
+local offset = 2
 
 local function build(map)
-	local data = map.data
+	local mapData = map.data
+	local world = filler.create(width, top - bottom + offset, height)
+
 	for x = 1, width do
-		local previous, previousRun = nil, 0
-		local row = data[x]
+		local mapRow = mapData[x]
+		local worldRow = world[x]
 		for z = 1, height do
-			local value = row[z]
-
-			if previous and previous ~= value then
-				local block = blocks[previous]
-
-				local startY = block.offset + config.map.bottom
-				local finishY = startY + block.height - 1
-				fill(x, startY, z - previousRun, x, finishY, z - 1, block.block)
-
-				previousRun = 0
-				previous = nil
-			end
-
-			local block = blocks[value]
+			local block = blocks[mapRow[z]]
 			if block.build then
 				block.build(x, z)
-			elseif block.block then
-				previous = value
-				previousRun = previousRun + 1
+			elseif block.blocks then
+				local blocks = block.blocks
+				for i = 1, #blocks do
+					local b = blocks[i]
+					if type(b) == "string" then
+						worldRow[offset][z] = b
+					else
+						local bOffset = offset + (b.offset or 0)
+						for y = 1, b.height or 1 do
+							worldRow[bOffset + y - 1][z] = b.block
+						end
+					end
+				end
 			end
 		end
-
-		if previous then
-			local block = blocks[previous]
-
-			local startY = block.offset + config.map.bottom
-			local finishY = startY + block.height - 1
-			fill(x, startY, width - previousRun + 1, x, finishY, width, block.block)
-
-			previousRun = 0
-			previous = nil
-		end
 	end
+
+	filler.optimise(world)
+	filler.build(world, 0, bottom - offset, 0)
 end
 
 local function clear()
 	kill("@e[type=!Player]")
+	tp("@a", 2, config.map.top + 2, -2)
 	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, "minecraft:quartz_block")
 	fill(1, config.map.bottom + 1, 1, width, config.map.top, height, "minecraft:air")
 end

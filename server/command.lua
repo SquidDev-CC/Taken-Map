@@ -1,7 +1,7 @@
 local commands = commands
 
 local function wrap(name, wrap, verbose)
-	if not commands then error("No commands") verbose = true end
+	if not commands then verbose = true end
 	if wrap or verbose then
 		local func
 		if not commands then
@@ -12,8 +12,8 @@ local function wrap(name, wrap, verbose)
 		return function(...)
 			local success, res = func(...)
 			if not success or verbose then
-				print(textutils.serialize({...}))
-				print(textutils.serialize(res))
+				print((textutils.serialize({...}):gsub("%s+", " ")))
+				print((textutils.serialize(res):gsub("%s+", " ")))
 			end
 
 			return success, res
