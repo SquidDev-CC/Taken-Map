@@ -22,7 +22,14 @@ local function build(map)
 		local mapRow = mapData[x]
 		local worldRow = world[x]
 		for z = 1, height do
-			local block = blocks[mapRow[z]]
+			local block = mapRow[z]
+			if type(block) == "table" then
+				worldRow[offset][z] = block[2]
+				block = block[1]
+			end
+
+			block = blocks[block]
+
 			if block.build then
 				block.build(x, z)
 			elseif block.blocks then

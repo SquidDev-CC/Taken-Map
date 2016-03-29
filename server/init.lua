@@ -1,13 +1,13 @@
 local sandbox = require "server.sandbox"
 local config = require "shared.config"
-local command = require "server.command".wrap
+local command = require "server.command"
 local network = require "shared.network"(config.clientId)
 local levels = require "server.loader"
 
-local tellraw = command("tellraw")
+local tellraw = command.wrap("tellraw")
 local function sayError(message)
 	printError(message)
-	tellraw("@a", {"",{text=message,color="red"}})
+	command.sayError(message)
 end
 
 local level = tonumber(... or 1) or 1

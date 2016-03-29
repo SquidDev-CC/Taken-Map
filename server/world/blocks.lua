@@ -1,21 +1,17 @@
 local config = require "shared.config"
-local command = require "server.command".wrap
+local command = require "server.command"
 
-local summon = command "summon"
-local kill = command "kill"
+local summon = command.wrap "summon"
+local kill = command.wrap "kill"
 
 return {
-	lava = {
-		blocks = { "minecraft:lava" },
-		decorate = false,
-	},
+	grass = { blocks = { "minecraft:grass" }, decorate = false, },
+	water = { blocks = { "minecraft:water" }, decorate = false, },
+	lava = { blocks = { "minecraft:lava" },   decorate = false, },
+
 	wall = {
 		blocks = {
-			{
-				block = "minecraft:iron_bars",
-				height = 2,
-				offset = 1,
-			},
+			{ block = "minecraft:iron_bars", height = 2, offset = 1, },
 		},
 		decorate = true,
 	},
@@ -24,28 +20,25 @@ return {
 	},
 	exit = {
 		blocks = {
-			{
-				block = "minecraft:beacon",
-				offset = -1,
-			},
+			{ block = "minecraft:beacon", offset = -1, },
 			"minecraft:stained_glass 3",
 		},
-		deocrate = false,
+		decorate = false,
 	},
-	empty = {
-		decorate = true,
-	},
+	empty = { decorate = true, },
 	mine = {
-		blocks = { "minecraft:stained_glass 2" },
+		decorate = true,
 		hit = function(x, y)
 			kill "@a"
+			command.say("Boom!")
 		end,
 	},
 	zombie = {
 		build = function(x, y)
 			-- Slightly OP. Eh.
 			summon("Zombie", x, config.map.bottom + 1, y,[=[{Equipment:[{id:"diamond_sword",damage:0,ench:[{id:8,lvl:20}]},{},{},{},{id:"leather_helmet",damage:0}],Attributes:[{Name:generic.movementSpeed,Base:0.5},{Name:generic.attackDamage,Base:100}]}]=])
-		end
+		end,
+		decorate = true,
 	},
 	computer = {
 		decorate = true,

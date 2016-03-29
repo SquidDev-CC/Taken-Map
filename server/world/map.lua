@@ -1,5 +1,6 @@
 local config = require "shared.config"
 local blocks = require "server.world.blocks"
+local decorations = require "server.world.decorations"
 
 local width, height = config.map.width, config.map.height
 
@@ -27,11 +28,41 @@ return function()
 
 		if x < 1 or x > width then error("X coordinate is out of bounds", 2) end
 		if y < 1 or y > height then error("Y coordinate is out of bounds", 2) end
-		if kind == "empty" or not blocks[kind] then error("No such block " .. kind, 2) end
+
+		local block = blocks[kind]
+		if kind == "empty" or not block then error("No such block " .. kind, 2) end
 
 		local row = data[x]
-		if row[y] ~= "empty" then error("Already a block at " .. x .. ", " .. y) end
-		row[y] = kind
+		local current = row[y]
+		if type(current) == "table" then
+			if current[1] ~= "empty" and current[1] ~= kind or not block.decorate then error("Already a block at " .. x .. ", " .. y) end
+			current[1] = kind
+		else
+			if current ~= "empty" and current ~= kind then error("Already a block at " .. x .. ", " .. y) end
+			row[y] = kind
+		end
+	end
+
+	function world.decorate(x, y, decoration)
+		if type(x) ~= "number" then error("Bad argument #1: expected number, got " .. type(x)) end
+		if type(y) ~= "number" then error("Bad argument #2: expected number, got " .. type(y)) end
+		if type(decoration) ~= "string" then error("Bad argument #3: expected string, got " .. type(decoration)) end
+
+		if x < 1 or x > width then error("X coordinate is out of bounds", 2) end
+		if y < 1 or y > height then error("Y coordinate is out of bounds", 2) end
+
+		local id = decorations[decoration]
+		if not id then error("No such decoration: " .. decoration, 2) end
+
+		local row = data[x]
+		local current = row[y]
+		if type(current) == "table" then
+			current[2] = id
+		else
+			local block = blocks[current]
+			if not block.decorate then error(current .. " cannot be decorated", 2) end
+			row[y] = { current, id }
+		end
 	end
 
 	function world.count()
@@ -61,7 +92,8 @@ return function()
 		for x = 1, width do
 			local row = data[x]
 			for y = 1, height do
-				if row[y] == kind then
+				local current = row[y]
+				if (type(current) == "table" and current[1] == kind) or row[y] == kind then
 					n = n + 1
 					items[n] = { x, y }
 				end

@@ -1,7 +1,7 @@
 --- Fills the world with blocks
 
 local command = require "server.command".wrap
-local fill = command("fill", true)
+local fill = command("fill", require "shared.config".debugFill)
 local type, assert = type, assert
 
 --- Create a new map data

@@ -46,7 +46,19 @@ local function many(commands)
 	end
 end
 
+local tellraw = wrap("tellraw")
+local function say(message)
+	tellraw("@a", {"",{text=message,color="white"}})
+end
+
+local function sayError(message)
+	tellraw("@a", {"",{text=message,color="red"}})
+end
+
 return {
 	wrap = wrap,
 	many = many,
+
+	say = say,
+	sayError = sayError,
 }
