@@ -46,20 +46,28 @@ function Editor:moveCursorTo(x, y)
 	local width = self:textWidth()
 
 	-- Y axis
-	if y > self.scroll.y and y <= self.scroll.y + self.height then
-		-- Within our current view
-		local previousY = self.cursor.y
-		self.cursor.y = y - self.scroll.y
-		self:updateGutter(previousY)
-	elseif y <= self.scroll.y then
+	if y <= self.scroll.y then
 		-- Above us
 		self.cursor.y = 1
 		self.scroll.y = y - 1
 		self:setDirty("full")
-	else
+	elseif y > self.scroll.y + self.height then
 		-- Below us
 		self.cursor.y = self.height
 		self.scroll.y = y - self.height
+		self:setDirty("full")
+	else
+		-- Within our current view
+		local previousY = self.cursor.y
+		self.cursor.y = y - self.scroll.y
+		self:updateGutter(previousY)
+	end
+
+	-- Handle making source smaller
+	local offset = self.scroll.y + self.height - #self.lines
+	if  offset > 0 then
+		self.cursor.y = self.cursor.y + offset
+		self.scroll.y = self.scroll.y - offset
 		self:setDirty("full")
 	end
 

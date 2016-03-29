@@ -89,6 +89,7 @@ end
 --- Renders a whole line - gutter and text.
 --- Does not redirect to the terminal.
 function Content:drawLine(y)
+
 	if self.editor:isReadOnly(y + self.editor.scroll.y) then
 		term.setBackgroundColor(Theme["editor readonly"][Theme["editor background"]])
 	else
