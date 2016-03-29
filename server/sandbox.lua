@@ -74,7 +74,7 @@ return function(files)
 
 	local map = world.setup()
 
-	builder.clear()
+	builder.clear(map)
 	sleep(0.05)
 	builder.build(map)
 	sleep(0.05)

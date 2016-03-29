@@ -5,9 +5,13 @@ local summon = command.wrap "summon"
 local kill = command.wrap "kill"
 
 return {
-	grass = { blocks = { "minecraft:grass" }, decorate = false, },
-	water = { blocks = { "minecraft:water" }, decorate = false, },
-	lava = { blocks = { "minecraft:lava" },   decorate = false, },
+	empty = {                                 decorate = true,  overwrite = true, },
+	-- Decoration style blocks
+	grass = { blocks = { "minecraft:grass" }, decorate = false, overwrite = true, },
+	water = { blocks = { "minecraft:water" }, decorate = false, overwrite = true, },
+
+	-- Useful blocks
+	lava  = { blocks = { "minecraft:lava" },  decorate = false, },
 
 	wall = {
 		blocks = {
@@ -25,7 +29,6 @@ return {
 		},
 		decorate = false,
 	},
-	empty = { decorate = true, },
 	mine = {
 		decorate = true,
 		hit = function(x, y)

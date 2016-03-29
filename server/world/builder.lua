@@ -53,10 +53,10 @@ local function build(map)
 	filler.build(world, 0, bottom - offset, 0)
 end
 
-local function clear()
+local function clear(map)
 	kill("@e[type=!Player]")
 	tp("@a", 2, config.map.bottom + 1, -2)
-	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, "minecraft:quartz_block")
+	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, map.base)
 	fill(1, config.map.bottom + 1, 1, width, config.map.top, height, "minecraft:air")
 end
 
