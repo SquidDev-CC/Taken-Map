@@ -40,11 +40,17 @@ SyntaxHighlighter.fullRedrawTriggers = "-[]\"'"
 --- Characters that are a valid identifier.
 SyntaxHighlighter.validIdentifiers = "0-9A-Za-z_"
 
+local function createLookup(data)
+	local out = {}
+	for i = 1, #data do out[data[i]] = true end
+	return out
+end
+
 --- All items highlighted on a line-by-line basis.
 -- Can be Lua patterns.
 -- Automatically wrapped in word separators.
 SyntaxHighlighter.keywords = {
-	["keywords"] = {
+	["keywords"] = createLookup {
 		"break",
 		"do",
 		"else",
@@ -61,15 +67,15 @@ SyntaxHighlighter.keywords = {
 		"local",
 		"in",
 	},
-	["constants"] = {
+	["constants"] = createLookup {
 		"true",
 		"false",
 		"nil",
 	},
-	["numbers"] = {
+	["numbers"] = createLookup {
 		"[0-9]+",
 	},
-	["operators"] = {
+	["operators"] = createLookup {
 		"%+",
 		"%-",
 		"%%",
@@ -89,7 +95,7 @@ SyntaxHighlighter.keywords = {
 		"or",
 		"not",
 	},
-	["functions"] = {
+	["functions"] = createLookup {
 		"print",
 		"write",
 		"sleep",
@@ -377,10 +383,8 @@ end
 function SyntaxHighlighter:kind(word)
 	-- Look for the word in each section of the keywords list
 	for section, options in pairs(SyntaxHighlighter.keywords) do
-		for _, option in pairs(options) do
-			if word:find("^" .. option .. "$") then
-				return section
-			end
+		if options[word] then
+			return section
 		end
 	end
 

@@ -418,7 +418,8 @@ function Editor:insertNewline()
 	if self:isReadOnly(y) then return end
 
 	local first = self.lines[y]:sub(1, x - 1)
-	local second = self.lines[y]:sub(x)
+	-- Ugly hack for LuaJ bug with string.find (See https://github.com/dan200/ComputerCraft/issues/91)
+	local second = self.lines[y]:sub(x) .. ""
 
 	self.lines[y] = first
 	self:addLine(y + 1, second)
