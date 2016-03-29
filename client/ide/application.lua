@@ -32,6 +32,26 @@ current:open("Another", {
 })
 current.editor:setReadOnly(true, 2)
 
+local buffer = {
+	"for i = 0, 10 do",
+	"  print('HELLO')",
+	"end",
+	"-- Insert code here",
+	"print('Hello')",
+	"",
+}
+
+local len = #buffer
+for _ = 1, 5 do
+	for i = 1, len do
+		buffer[#buffer + 1] = buffer[i]
+	end
+end
+
+controller.tabBar:create()
+current = controller.tabBar.contentManager.contents[3]
+current:open("Long", buffer)
+
 controller:run()
 
 term.redirect(originalTerminal)

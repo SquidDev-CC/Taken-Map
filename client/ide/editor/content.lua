@@ -1,6 +1,5 @@
 --- One tab of content
 
-local Buffer = require "client.ide.ui.buffer"
 local Editor = require "client.ide.editor.editor"
 local SyntaxHighlighter = require "client.ide.editor.highlighter"
 local Theme = require "client.ide.theme"
@@ -26,7 +25,7 @@ function Content.new(...)
 	local w, h = term.native().getSize()
 	self.height = h - Content.startY + 1
 	self.width = w
-	self.win = Buffer(term.native(), 1, Content.startY, self.width, self.height, false)
+	self.win = window.create(term.native(), 1, Content.startY, self.width, self.height, false)
 	self.editor = Editor.new({""}, self.width, self.height)
 	self.path = nil
 	self.highlighter = SyntaxHighlighter.new()
@@ -59,7 +58,7 @@ end
 --- Shows the content window's window, redrawing it over the existing screen space
 --- and restoring the cursor to its original position in the window.
 function Content:show()
-	term.redirect(self.win.redirect)
+	term.redirect(self.win)
 	self.win.setVisible(true)
 	self:draw()
 	self:restoreCursor()
@@ -76,7 +75,7 @@ end
 function Content:restoreCursor()
 	local x, y = self.editor:cursorPosition()
 
-	term.redirect(self.win.redirect)
+	term.redirect(self.win)
 	term.setCursorPos(x, y)
 	if self.editor:isReadOnly(y + self.editor.scroll.y) then
 		term.setTextColor(Theme["editor readonly"][Theme["editor text"]])
@@ -176,7 +175,7 @@ end
 
 --- Fully redraws the editor.
 function Content:draw()
-	term.redirect(self.win.redirect)
+	term.redirect(self.win)
 
 	-- Clear
 	term.setBackgroundColor(Theme["editor background"])
@@ -201,7 +200,7 @@ function Content:updateDirty()
 		if dirty == "full" then
 			self:draw()
 		else
-			term.redirect(self.win.redirect)
+			term.redirect(self.win)
 			for _, data in pairs(dirty) do
 				if data.kind == "gutter" then
 					self:drawGutter(data.data)
@@ -283,8 +282,11 @@ function Content:event(event)
 	elseif event[1] == "key" then
 		self:key(event[2])
 	elseif event[1] == "mouse_click" then
-		self.editor:moveCursorToRelative(event[3] - self.editor:gutterSize(), event[4])
-		returnVal = true
+		local gutterSize = self.editor:gutterSize()
+		if event[3] > gutterSize then
+			self.editor:moveCursorToRelative(event[3] - self.editor:gutterSize(), event[4])
+			returnVal = true
+		end
 	elseif event[1] == "mouse_scroll" then
 		if event[2] == 1 then
 			self.editor:moveCursorDown()
