@@ -62,7 +62,6 @@ Theme.load = function()
 		Theme["keywords"] = colors.lightBlue
 		Theme["constants"] = colors.orange
 		Theme["operators"] = colors.blue
-		Theme["numbers"] = colors.black
 		Theme["functions"] = colors.magenta
 		Theme["string"] = colors.red
 		Theme["comment"] = colors.lightGray

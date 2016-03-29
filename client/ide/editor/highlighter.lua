@@ -3,54 +3,26 @@
 local SyntaxHighlighter = {}
 SyntaxHighlighter.__index = SyntaxHighlighter
 
---- Tags that specify the start and end of mapped data.
--- Must be iterated in order.
--- A nil end tag means the end of the line.
-SyntaxHighlighter.tags = {
-	{
-		["start"] = "--[[",
-		["end"] = "]]",
-		["kind"] = "comment",
-	},
-	{
-		["start"] = "--",
-		["end"] = nil,
-		["kind"] = "comment",
-	},
-	{
-		["start"] = "[[",
-		["end"] = "]]",
-		["kind"] = "string",
-	},
-	{
-		["start"] = "\"",
-		["end"] = "\"",
-		["kind"] = "string",
-	},
-	{
-		["start"] = "'",
-		["end"] = "'",
-		["kind"] = "string",
-	},
-}
+--- Characters that are a valid identifier.
+SyntaxHighlighter.validIdentifiers = "0-9A-Za-z_"
 
 --- Characters that should trigger a full redraw of the screen.
 SyntaxHighlighter.fullRedrawTriggers = "-[]\"'"
 
---- Characters that are a valid identifier.
-SyntaxHighlighter.validIdentifiers = "0-9A-Za-z_"
 
 local function createLookup(data)
 	local out = {}
-	for i = 1, #data do out[data[i]] = true end
+	for name, items in pairs(data) do
+		for i = 1, #items do out[items[i]] = name end
+	end
 	return out
 end
 
 --- All items highlighted on a line-by-line basis.
 -- Can be Lua patterns.
 -- Automatically wrapped in word separators.
-SyntaxHighlighter.keywords = {
-	["keywords"] = createLookup {
+SyntaxHighlighter.keywords = createLookup {
+	["keywords"] = {
 		"break",
 		"do",
 		"else",
@@ -67,22 +39,19 @@ SyntaxHighlighter.keywords = {
 		"local",
 		"in",
 	},
-	["constants"] = createLookup {
+	["constants"] = {
 		"true",
 		"false",
 		"nil",
 	},
-	["numbers"] = createLookup {
-		"[0-9]+",
-	},
-	["operators"] = createLookup {
-		"%+",
-		"%-",
-		"%%",
+	["operators"] = {
+		"+",
+		"-",
+		"%",
 		"#",
-		"%*",
+		"*",
 		"/",
-		"%^",
+		"^",
 		"=",
 		"==",
 		"~=",
@@ -95,7 +64,7 @@ SyntaxHighlighter.keywords = {
 		"or",
 		"not",
 	},
-	["functions"] = createLookup {
+	["functions"] = {
 		"print",
 		"write",
 		"sleep",
@@ -122,6 +91,45 @@ SyntaxHighlighter.keywords = {
 	},
 }
 
+--- Tags that specify the start and end of mapped data.
+-- Must be iterated in order.
+-- A nil end tag means the end of the line.
+SyntaxHighlighter.tags = {
+	{
+		["start"] = "%-%-%[%[",
+		["end"] = "%]%]",
+		["multiline"] = true,
+		["kind"] = "comment",
+	},
+	{
+		["start"] = "%-%-",
+		["end"] = nil,
+		["kind"] = "comment",
+	},
+	{
+		["start"] = "%[%[",
+		["end"] = "%]%]",
+		["multiline"] = true,
+		["kind"] = "string",
+	},
+	{
+		["start"] = "\"",
+		["end"] = "\"",
+		["kind"] = "string",
+	},
+	{
+		["start"] = "'",
+		["end"] = "'",
+		["kind"] = "string",
+	},
+	{
+		["start"] = "[" .. SyntaxHighlighter.validIdentifiers .. "]",
+		["end"] = "[^" .. SyntaxHighlighter.validIdentifiers .. "]",
+		["exclude"] = true,
+		["kind"] = "keywords",
+		["lookup"] = SyntaxHighlighter.keywords
+	}
+}
 
 --- Create a new syntax highlighter.
 function SyntaxHighlighter.new(...)
@@ -161,6 +169,8 @@ function SyntaxHighlighter:recalculateMappedData()
 	self.map = {}
 	local current = nil
 	local currentEnding = nil
+	local currentExclude = false
+	local currentMultiline = false
 
 	for y = 1, #self.lines do
 		local line = self.lines[y]
@@ -178,20 +188,32 @@ function SyntaxHighlighter:recalculateMappedData()
 					break
 				else
 					-- Look for an ending tag
-					local start, finish = line:find(currentEnding, position, true)
+					local start, finish = line:find(currentEnding, position)
 
 					if not start or not finish then
-						-- Ending tag not on this line
-						break
-					else
-						-- Found ending tag
-						current["endY"] = y
-						current["endX"] = finish
-						table.insert(self.map, current)
-						current = nil
-						currentEnding = nil
-						position = finish + 1
+						if currentMultiline then
+							-- Ending tag not on this line
+							break
+						else
+							finish = #line
+						end
+					elseif currentExclude then
+						finish = finish - 1
 					end
+
+					if currentLookup and y == current["startY"] then
+						local text = currentLookup[line:sub(current["startX"], finish)]
+						if text then current["kind"] = text end
+					end
+
+
+					-- Found ending tag
+					current["endY"] = y
+					current["endX"] = finish
+					table.insert(self.map, current)
+					current = nil
+					currentEnding = nil
+					position = finish + 1
 				end
 			else
 				local start = nil
@@ -200,10 +222,13 @@ function SyntaxHighlighter:recalculateMappedData()
 
 				-- Attempt to find a starting tag
 				for _, possible in pairs(SyntaxHighlighter.tags) do
-					start, finish = line:find(possible["start"], position, true)
-					if start and finish then
-						tag = possible
-						break
+					local nStart, nFinish = line:find(possible["start"], position)
+					if nStart and nFinish then
+						if not start or nStart < start then
+							tag = possible
+							start = nStart
+							finish = nFinish
+						end
 					end
 				end
 
@@ -213,6 +238,9 @@ function SyntaxHighlighter:recalculateMappedData()
 				else
 					-- Found starting tag
 					currentEnding = tag["end"]
+					currentExclude = tag["exclude"]
+					currentMultiline = tag["multiline"]
+					currentLookup = tag["lookup"]
 					current = {
 						["kind"] = tag["kind"],
 						["startY"] = y,
@@ -232,6 +260,10 @@ function SyntaxHighlighter:recalculateMappedData()
 	end
 end
 
+local function getKind(data, text)
+	local lookup = data.lookup
+	return lookup and lookup[text] or data.kind
+end
 
 --- Returns highlight data for a line, starting at
 --- a given x scroll position.
@@ -258,7 +290,9 @@ function SyntaxHighlighter:data(y, horizontalScroll, width)
 
 	local lineStart = horizontalScroll + 1
 	local lineFinish = horizontalScroll + width
-	local line = self.lines[y]:sub(lineStart, lineFinish)
+	local line = self.lines[y]
+	if not line then return {} end
+	line = line:sub(lineStart, lineFinish)
 
 	local startText = nil
 	local startKeyword = nil
@@ -331,8 +365,8 @@ function SyntaxHighlighter:data(y, horizontalScroll, width)
 			for _, data in pairs(self.map) do
 				if data.startY == y and data.endY == y then
 					-- Only on this line
-					potentialStart = data.startX - lineStart - #startText + 1
-					potentialFinish = data.endX - lineStart - #startText + 1
+					local potentialStart = data.startX - lineStart - #startText + 1
+					local potentialFinish = data.endX - lineStart - #startText + 1
 
 					if potentialStart >= position and potentialFinish >= position then
 						-- Found the next mapped data
@@ -382,13 +416,7 @@ end
 --- Returns the kind for a word.
 function SyntaxHighlighter:kind(word)
 	-- Look for the word in each section of the keywords list
-	for section, options in pairs(SyntaxHighlighter.keywords) do
-		if options[word] then
-			return section
-		end
-	end
-
-	return "text"
+	return SyntaxHighlighter.keywords[word] or "text"
 end
 
 
