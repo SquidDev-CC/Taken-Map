@@ -24,26 +24,6 @@ return function()
 	world.height = height
 	world.ceiling = config.map.ceiling
 
-	function world.setBlocks(x, y, width, height, kind)
-		if type(x) ~= "number" then error("Bad argument #1: expected number, got " .. type(x), 2) end
-		if type(y) ~= "number" then error("Bad argument #2: expected number, got " .. type(y), 2) end
-		if type(width) ~= "number" then error("Bad argument #3: expected number, got " .. type(width), 2) end
-		if type(height) ~= "number" then error("Bad argument #4: expected number, got " .. type(height), 2) end
-		if type(kind) ~= "string" then error("Bad argument #5: expected string, got " .. type(kind), 2) end
-
-		if width <= 0 then error("width is <= 0", 2) end
-		if height <= 0 then error("height is <= 0", 2) end
-
-		width = width + x - 1
-		height = height + y - 1
-
-		for x = x, width do
-			for y = y, height do
-				world.setBlock(x, y, kind)
-			end
-		end
-	end
-
 	function world.setEnvironment(kind)
 		local env = environment[kind]
 		if not env then error("No such environment " .. tostring(kind), 2) end

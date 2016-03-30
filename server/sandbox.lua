@@ -38,6 +38,12 @@ local function copy(table, cache, blacklist)
 	return out
 end
 
+local function setupWorld(world)
+	local clone = copy(world, nil, {setup = true})
+	helpers(clone)
+	return clone
+end
+
 local function makeEnv()
 	local env = {}
 	env.print = sayPrint
@@ -48,7 +54,6 @@ local function makeEnv()
 	env.math = copy(math)
 	env.string = copy(string)
 	env.assert = copy(asserts)
-	env.helpers = copy(helpers)
 
 	env._G = env
 
@@ -71,9 +76,9 @@ return function(files)
 	if not backup.generate then error("No generate function", 0) end
 
 	local world = map()
-	if backup.setup then backup.setup(copy(world, nil, { setup = true })) end
-	backup.generate(copy(world, nil, { setup = true }))
-	if backup.validate then backup.validate(copy(world, nil, { setup = true })) end
+	if backup.setup then backup.setup(setupWorld(world)) end
+	backup.generate(setupWorld(world))
+	if backup.validate then backup.validate(setupWorld(world)) end
 
 	local map = world.setup()
 
