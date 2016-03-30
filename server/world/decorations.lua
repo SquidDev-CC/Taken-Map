@@ -2,7 +2,6 @@ local decorations = {}
 
 local function add(name, number)
 	decorations[name] = "minecraft:stained_hardened_clay " .. math.floor(math.log(number) / math.log(2))
-	decorations[name .. "Wool"] = "minecraft:wool " .. math.floor(math.log(number) / math.log(2))
 end
 
 for name, v in pairs(colors) do

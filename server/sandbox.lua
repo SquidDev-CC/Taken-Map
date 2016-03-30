@@ -44,6 +44,11 @@ local function setupWorld(world)
 	return clone
 end
 
+local function setupPlayer(player)
+	local clone = copy(player, nil, {setup = true})
+	return clone
+end
+
 local function makeEnv()
 	local env = {}
 	env.print = sayPrint
@@ -76,9 +81,11 @@ return function(files)
 	if not backup.generate then error("No generate function", 0) end
 
 	local world = map()
-	if backup.setup then backup.setup(setupWorld(world)) end
-	backup.generate(setupWorld(world))
-	if backup.validate then backup.validate(setupWorld(world)) end
+	local player = player()
+
+	if backup.setup then backup.setup(setupWorld(world), setupPlayer(player)) end
+	backup.generate(setupWorld(world), setupPlayer(player))
+	if backup.validate then backup.validate(setupWorld(world), setupPlayer(player)) end
 
 	local map = world.setup()
 
@@ -87,6 +94,7 @@ return function(files)
 	builder.build(map)
 	sleep(0.05)
 	builder.setup(map)
+	player.setup()
 
 	return function(state)
 		local previousSuccess = false
@@ -106,7 +114,7 @@ return function(files)
 
 						if block == "exit" then
 							if backup.exit then
-								local success, msg = pcall(backup.exit, copy(player))
+								local success, msg = pcall(backup.exit, setupPlayer(player))
 								if success then
 									break
 								elseif not previousSuccess then
@@ -118,7 +126,7 @@ return function(files)
 							end
 						elseif block then
 							block = blocks[block]
-							if block and block.hit then block.hit(x, z) end
+							if block and block.hit then block.hit(x, z, player, unpack(blockData[3] or {})) end
 						end
 					end
 				end

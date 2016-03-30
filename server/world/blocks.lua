@@ -4,11 +4,17 @@ local command = require "server.command"
 local summon = command.wrap "summon"
 local kill = command.wrap "kill"
 
+local function getColor(color)
+	if color == "red" then return 14, color
+	elseif color == "green" then return 5, color
+	elseif color == "blue" then return 11, color
+	else error("Unknown color: " .. tostring(color), 2) end
+end
+
 return {
 	empty = {                                 decorate = true,  overwrite = true, },
 	-- Decoration style blocks
 	grass = { blocks = { "minecraft:grass" }, decorate = false, overwrite = true, },
-	-- water = { blocks = { "minecraft:water" }, decorate = false, overwrite = true, },
 
 	-- Useful blocks
 	lava  = { blocks = { "minecraft:lava" },  decorate = false, },
@@ -25,6 +31,32 @@ return {
 			return height
 		end,
 		decorate = false,
+	},
+
+	gate = {
+		build = function(x, y, builder, num, col)
+			builder[x][2][y] = "minecraft:wool " .. num
+		end,
+		hit = function(x, y, player, num, col)
+			if player.getState() ~= col then
+				kill("@a")
+				command.say("You're not " .. col)
+			end
+		end,
+		args = getColor,
+		decorate = false,
+	},
+
+	dye = {
+		build = function(x, y, builder, num, col)
+			builder[x][2][y] = "minecraft:stained_glass " .. num
+		end,
+		hit = function(x, y, player, num, col)
+			player.setState(col)
+		end,
+		args = getColor,
+		decorate = false,
+		overwrite = true,
 	},
 
 	wall = {

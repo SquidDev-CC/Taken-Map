@@ -13,7 +13,7 @@ function generate(world)
 end
 
 function setup(world)
-	world.setTitle("Chapter #7", "MINEcraft!")
+	world.setTitle("Chapter #8", "MINEcraft!")
 	world.setEnvironment("plain")
 	--@start
 
