@@ -4,8 +4,6 @@ horde right?
 ]]
 
 function generate(world)
-	world.setTitle("Chapter #4", "Hordes of Zombies")
-	world.setEnvironment "plain"
 	world.setBlock(2, 2, "entrance")
 	world.setBlock(15, 3, "exit")
 
@@ -29,6 +27,14 @@ function generate(world)
 		world.setBlock(4, y, "wall")
 	end
 --@stop
+end
+
+function setup(world)
+	world.setTitle("Chapter #4", "Hordes of Zombies")
+	world.setEnvironment("lab")
+	--@start
+
+	--@stop
 end
 
 function validate(world)

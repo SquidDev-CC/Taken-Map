@@ -4,12 +4,6 @@ local command = require "server.command"
 local network = require "shared.network"(config.clientId)
 local levels = require "server.loader"
 
-local tellraw = command.wrap("tellraw")
-local function sayError(message)
-	printError(message)
-	command.sayError(message)
-end
-
 local level = tonumber(... or 1) or 1
 while true do
 	local levelFiles = levels[level] or error("No such level " .. level)
@@ -51,15 +45,15 @@ while true do
 						level = level + 1
 						running = false
 					else
-						sayError(message)
+						command.sayError(message)
 					end
 				end,
 				updateFiles
 			)
 		else
-			sayError(result)
+			command.sayError(result)
 			if levelFiles == files then
-				sayError "Quitting. We hit an error in the original source."
+				command.sayError "Quitting. We hit an error in the original source."
 				error("Error in original source")
 			else
 				updateFiles()

@@ -9,7 +9,6 @@ this.
 ]]
 
 function generate(world)
-	world.setTitle("Chapter #2", "The floor is lava")
 	world.setBlock(3, 3, "entrance")
 	world.setBlock(15, 3, "exit")
 --@start
@@ -19,6 +18,14 @@ function generate(world)
 --@start
 
 --@stop
+end
+
+function setup(world)
+	world.setTitle("Chapter #2", "The floor is lava")
+	world.setEnvironment("lab")
+	--@start
+
+	--@stop
 end
 
 function validate(world)

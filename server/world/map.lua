@@ -8,12 +8,12 @@ local width, height = config.map.width, config.map.height
 return function()
 	local data = {}
 	local map = { data = data }
-	local base = "minecraft:quartz_block"
+	local worldEnv
 
 	for x = 1, width do
 		local row = {}
 		for y = 1, height do
-			row[y] = "empty"
+			row[y] = { "empty" }
 		end
 		data[x] = row
 	end
@@ -22,6 +22,7 @@ return function()
 
 	world.width = width
 	world.height = height
+	world.ceiling = config.map.ceiling
 
 	function world.setBlocks(x, y, width, height, kind)
 		if type(x) ~= "number" then error("Bad argument #1: expected number, got " .. type(x), 2) end
@@ -33,8 +34,8 @@ return function()
 		if width <= 0 then error("width is <= 0", 2) end
 		if height <= 0 then error("height is <= 0", 2) end
 
-		width = width + x
-		height = height + x
+		width = width + x - 1
+		height = height + y - 1
 
 		for x = x, width do
 			for y = y, height do
@@ -46,10 +47,11 @@ return function()
 	function world.setEnvironment(kind)
 		local env = environment[kind]
 		if not env then error("No such environment " .. tostring(kind), 2) end
-		base = assert(env(world), "Invalid environment")
+		if worldEnv then error("Already have an environment", 2) end
+		worldEnv = env
 	end
 
-	function world.setBlock(x, y, kind)
+	function world.setBlock(x, y, kind, ...)
 		if type(x) ~= "number" then error("Bad argument #1: expected number, got " .. type(x), 2) end
 		if type(y) ~= "number" then error("Bad argument #2: expected number, got " .. type(y), 2) end
 		if type(kind) ~= "string" then error("Bad argument #3: expected string, got " .. type(kind), 2) end
@@ -60,20 +62,19 @@ return function()
 		local block = blocks[kind]
 		if not block then error("No such block " .. kind, 2) end
 
+		local args
+		if block.args then args = {block.args(...)} end
+
 		local row = data[x]
 		local current = row[y]
-		if type(current) == "table" then
-			if current[1] ~= kind and not blocks[current[1]].overwrite then error("Already a block at " .. x .. ", " .. y, 2) end
+		if current[1] ~= kind and not blocks[current[1]].overwrite then error("Already a block at " .. x .. ", " .. y, 2) end
 
-			if block.decorate then
-				current[1] = kind
-			else
-				-- Clear decoration
-				row[y] = kind
-			end
+		if block.decorate then
+			current[1] = kind
+			current[3] = args
 		else
-			if current ~= kind and not blocks[current].overwrite then error("Already a block at " .. x .. ", " .. y, 2) end
-			row[y] = kind
+			-- Clear decoration
+			row[y] = { kind, nil, args }
 		end
 	end
 
@@ -90,13 +91,9 @@ return function()
 
 		local row = data[x]
 		local current = row[y]
-		if type(current) == "table" then
-			current[2] = id
-		else
-			local block = blocks[current]
-			if not block.decorate then error(current .. " cannot be decorated", 2) end
-			row[y] = { current, id }
-		end
+		local block = blocks[current[1]]
+		if not block.decorate then error(current[1] .. " cannot be decorated", 2) end
+		current[2] = id
 	end
 
 	function world.count()
@@ -109,7 +106,7 @@ return function()
 		for x = 1, width do
 			local row = data[x]
 			for y = 1, height do
-				local value = row[y]
+				local value = row[y][1]
 				counts[value] = counts[value] + 1
 			end
 		end
@@ -127,7 +124,7 @@ return function()
 			local row = data[x]
 			for y = 1, height do
 				local current = row[y]
-				if (type(current) == "table" and current[1] == kind) or row[y] == kind then
+				if current[1] == kind then
 					n = n + 1
 					items[n] = { x, y }
 				end
@@ -150,8 +147,10 @@ return function()
 		local entrance = world.find("entrance")[1]
 		if not entrance then error("Cannot find entrance", 2) end
 
+		map.width = width
+		map.height = height
 		map.entrance = entrance
-		map.base = base
+		map.env = worldEnv or environment.lab
 		return map
 	end
 

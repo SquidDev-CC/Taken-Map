@@ -9,7 +9,6 @@ move it.
 ]]
 
 function generate(world)
-	world.setTitle("Chapter #3", "Move that wall")
 	world.setBlock(3, 3, "entrance")
 	world.setBlock(15, 3, "exit")
 
@@ -18,6 +17,14 @@ function generate(world)
 		world.setBlock(9, x, "wall")
 	end
 --@stop
+end
+
+function setup(world)
+	world.setTitle("Chapter #3", "Move that wall")
+	world.setEnvironment("lab")
+	--@start
+
+	--@stop
 end
 
 function validate(world)

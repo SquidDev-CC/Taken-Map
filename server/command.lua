@@ -48,10 +48,12 @@ end
 
 local tellraw = wrap("tellraw")
 local function say(message)
+	print(message)
 	tellraw("@a", {"",{text=message,color="white"}})
 end
 
 local function sayError(message)
+	printError(message)
 	tellraw("@a", {"",{text=message,color="red"}})
 end
 

@@ -8,10 +8,24 @@ return {
 	empty = {                                 decorate = true,  overwrite = true, },
 	-- Decoration style blocks
 	grass = { blocks = { "minecraft:grass" }, decorate = false, overwrite = true, },
-	water = { blocks = { "minecraft:water" }, decorate = false, overwrite = true, },
+	-- water = { blocks = { "minecraft:water" }, decorate = false, overwrite = true, },
 
 	-- Useful blocks
 	lava  = { blocks = { "minecraft:lava" },  decorate = false, },
+	platform = {
+		build = function(x, y, builder, height)
+			builder[x][height + 2][y] = "minecraft:stained_glass 1"
+		end,
+		args = function(height)
+			if type(height) ~= "number" then error("Bad argument #4, expected number, got " .. type(height), 3) end
+			if height < 0 or height > config.map.ceiling then
+				error("Height is out of range", 3)
+			end
+
+			return height
+		end,
+		decorate = false,
+	},
 
 	wall = {
 		blocks = {

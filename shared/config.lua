@@ -5,6 +5,7 @@ return {
 	map = {
 		bottom = 64,
 		top = 71,
+		ceiling = 7,
 
 		width = 24,
 		height = 24,

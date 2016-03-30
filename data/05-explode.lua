@@ -3,7 +3,6 @@ Lookout for the mines.
 ]]
 
 function generate(world)
-	world.setTitle("Chapter #5", "Heavy explosives")
 	world.setBlock(2, 2, "entrance")
 	world.setBlock(15, 3, "exit")
 
@@ -18,6 +17,14 @@ function generate(world)
 		end
 	end
 --@stop
+end
+
+function setup(world)
+	world.setTitle("Chapter #5", "Heavy explosives")
+	world.setEnvironment("lab")
+	--@start
+
+	--@stop
 end
 
 function validate(world)

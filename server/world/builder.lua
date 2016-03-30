@@ -18,20 +18,21 @@ local function build(map)
 	local mapData = map.data
 	local world = filler.create(width, top - bottom + offset, height)
 
+	map.env.setup(world, map)
+
 	for x = 1, width do
 		local mapRow = mapData[x]
 		local worldRow = world[x]
 		for z = 1, height do
-			local block = mapRow[z]
-			if type(block) == "table" then
-				worldRow[offset][z] = block[2]
-				block = block[1]
+			local blockData = mapRow[z]
+			if blockData[2] then
+				worldRow[offset][z] = blockData[2]
 			end
 
-			block = blocks[block]
+			local block = blocks[blockData[1]]
 
 			if block.build then
-				block.build(x, z)
+				block.build(x, z, world, unpack(blockData[3] or {}))
 			elseif block.blocks then
 				local blocks = block.blocks
 				for i = 1, #blocks do
@@ -56,7 +57,7 @@ end
 local function clear(map)
 	kill("@e[type=!Player]")
 	tp("@a", 2, config.map.bottom + 1, -2)
-	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, map.base)
+	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, map.env.base)
 	fill(1, config.map.bottom + 1, 1, width, config.map.top, height, "minecraft:air")
 end
 

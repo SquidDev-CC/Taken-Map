@@ -9,10 +9,13 @@ head to the exit
 ]]
 
 function generate(world)
-	world.setTitle("Chapter #1", "Getting started")
 	world.setBlock(3, 3, "entrance")
 	world.setBlock(7, 7, "computer")
 	world.setBlock(10, 10, "exit")
+end
+
+function setup(world)
+	world.setTitle("Chapter #1", "Getting started")
 end
 
 function exit(player)

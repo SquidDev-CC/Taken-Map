@@ -1,8 +1,9 @@
 local asserts = require "shared.asserts"
+local blocks = require "server.world.blocks"
 local builder = require "server.world.builder"
 local command = require "server.command"
+local helpers = require "server.world.helpers"
 local map = require "server.world.map"
-local blocks = require "server.world.blocks"
 local player = require "server.world.player"
 
 local function sayPrint(...)
@@ -47,6 +48,7 @@ local function makeEnv()
 	env.math = copy(math)
 	env.string = copy(string)
 	env.assert = copy(asserts)
+	env.helpers = copy(helpers)
 
 	env._G = env
 
@@ -69,6 +71,7 @@ return function(files)
 	if not backup.generate then error("No generate function", 0) end
 
 	local world = map()
+	if backup.setup then backup.setup(copy(world, nil, { setup = true })) end
 	backup.generate(copy(world, nil, { setup = true }))
 	if backup.validate then backup.validate(copy(world, nil, { setup = true })) end
 
@@ -92,24 +95,26 @@ return function(files)
 				x, z = math.floor(x), math.floor(z)
 				local row = map.data[x]
 				if row then
-					local block = row[z]
-					if type(block) == "table" then block = block[1] end
+					local blockData = row[z]
+					if blockData then
+						local block = blockData[1]
 
-					if block == "exit" then
-						if backup.exit then
-							local success, msg = pcall(backup.exit, copy(player))
-							if success then
+						if block == "exit" then
+							if backup.exit then
+								local success, msg = pcall(backup.exit, copy(player))
+								if success then
+									break
+								elseif not previousSuccess then
+									command.sayError(msg)
+								end
+								previousSuccess = true
+							else
 								break
-							elseif not previousSuccess then
-								command.sayError(msg)
 							end
-							previousSuccess = true
-						else
-							break
+						elseif block then
+							block = blocks[block]
+							if block and block.hit then block.hit(x, z) end
 						end
-					elseif block then
-						block = blocks[block]
-						if block and block.hit then block.hit(x, z) end
 					end
 				end
 			end
