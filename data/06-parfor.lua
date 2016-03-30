@@ -35,9 +35,6 @@ end
 function setup(world)
 	world.setTitle("Chapter #6", "Parfor")
 	world.setEnvironment("plain")
-	--@start
-
-	--@stop
 end
 
 function validate(world)
