@@ -64,8 +64,11 @@ function Editor:moveCursorTo(x, y)
 	end
 
 	-- Handle making source smaller
-	local offset = self.scroll.y + self.height - #self.lines
-	if  offset > 0 then
+	local delta = self.height - #self.lines
+	local offset = self.scroll.y + delta
+	if offset > 0 and delta < 0 then
+		print("Offset: " .. offset, self.scroll.y, self.heigh)
+		sleep(1)
 		self.cursor.y = self.cursor.y + offset
 		self.scroll.y = self.scroll.y - offset
 		self:setDirty("full")
