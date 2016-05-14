@@ -85,7 +85,7 @@ return {
 	zombie = {
 		build = function(x, y)
 			-- Slightly OP. Eh.
-			summon("Zombie", x, config.map.bottom + 1, y,[=[{Equipment:[{id:"diamond_sword",damage:0,ench:[{id:8,lvl:20}]},{},{},{},{id:"leather_helmet",damage:0}],Attributes:[{Name:generic.movementSpeed,Base:0.5},{Name:generic.attackDamage,Base:100}]}]=])
+			summon("Zombie", x, config.map.bottom + 1, y,[=[{Attributes:[{Name:generic.attackDamage,Base:100},{Name:generic.movementSpeed,Base:0.5}],Equipment:[{id:"diamond_sword",damage:0,ench:[{id:8,lvl:20}]},{},{},{},{id:"leather_helmet",damage:0,ench:[{id:16,lvl:20}]}],Invulnerable:1,ActiveEffects:[{Id:17,Amplifier:"",Duration:"",ShowParticles:0b}]}]=])
 		end,
 		decorate = true,
 	},

@@ -5,10 +5,12 @@ local command = require "server.command"
 local config = require "shared.config"
 local helpers = require "server.world.helpers"
 local map = require "server.world.map"
+local parse = require "server.parse"
 local player = require "server.world.player"
 
 local deltas = { -config.checkOffset, config.checkOffset }
 local debugParticles = config.debugParticles
+local validFunctions = { setup = true, validate = true, generate = true, exit = true }
 
 local function sayPrint(...)
 	local args = { ... }
@@ -76,6 +78,32 @@ return function(files)
 	local env = {}
 	local func, msg = load(text, file.name, nil, env)
 	if not func then error(msg or "Cannot load file", 0) end
+
+	local parsed = parse(text)
+	local defined = {}
+	local function makeError(node, msg)
+		local header = file.name .. ":"
+		if node and node.Head then
+			header = header .. node.Head.Line .. ":"
+		end
+
+		error(header .. " " .. msg, 0)
+	end
+	for _, v in ipairs(parsed.Body) do
+		if v.AstType == "Function" then
+			if v.IsLocal then makeError(v, "Cannot use local functions") end
+			if v.Name.AstType ~= "VarExpr" then makeError(v, "Cannot declare indexed function") end
+			local name = v.Name.Name
+			if not validFunctions[name] then makeError(v, "Cannot define function " .. name) end
+			if defined[name] then makeError(v, name .. " has already been defined") end
+
+			defined[name] = true
+		else
+			-- Make CamelCase type more readable
+			local type = v.AstType:gsub("(%u)", " %1"):gsub("^%s", ""):lower()
+			makeError(v, "Invalid " .. type)
+		end
+	end
 
 	func()
 
