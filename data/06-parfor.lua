@@ -2,9 +2,9 @@
 Have fun jumping
 ]]
 
-local min = math.min
-local max = math.max
 function generate(world)
+	local min = math.min
+	local max = math.max
 	world.setBlock(2, 2, "entrance")
 	world.setBlock(world.height - 1, world.width - 1, "exit")
 
@@ -38,6 +38,6 @@ function setup(world)
 end
 
 function validate(world)
-	assert.eq(1, #world.find("exit"), "exit")
-	assert.eq(1, #world.find("entrance"), "entrance")
+	assert.eq(1, world.count("exit"), "exit")
+	assert.eq(1, world.count("entrance"), "entrance")
 end

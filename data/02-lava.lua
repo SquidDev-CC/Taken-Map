@@ -14,7 +14,7 @@ function generate(world)
 --@start
 
 --@stop
-	world.setBlocks(7, 1, 13 - 7, world.height, "lava")
+	world.setBlocks(5, 1, 13 - 5, world.height, "lava")
 --@start
 
 --@stop
@@ -29,6 +29,6 @@ function setup(world)
 end
 
 function validate(world)
-	assert.eq(1, #world.find("exit"), "exit")
-	assert.eq(1, #world.find("entrance"), "entrance")
+	assert.eq(1, world.count("exit"), "exit")
+	assert.eq(1, world.count("entrance"), "entrance")
 end

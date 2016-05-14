@@ -7,11 +7,11 @@ function generate(world)
 	world.setBlock(15, 3, "exit")
 
 	for i = 0, 200 do
-		local x = math.random(5, world.width)
+		local x = math.random(1, world.width)
 		local y = math.random(1, world.height)
 
 		-- Prevent overwriting entrance
-		if (x ~= 2 or y ~= 2) and (x ~= 15 and y ~= 3) then
+		if (x ~= 2 or y ~= 2) and (x ~= 15 or y ~= 3) then
 			world.setBlock(x, y, "mine")
 --@start
 
@@ -29,7 +29,7 @@ function setup(world)
 end
 
 function validate(world)
-	assert.lt(80, #world.find("mine"), "mines")
-	assert.eq(1, #world.find("exit"), "exit")
-	assert.eq(1, #world.find("entrance"), "entrance")
+	assert.lt(80, world.count("mine"), "mines")
+	assert.eq(1, world.count("exit"), "exit")
+	assert.eq(1, world.count("entrance"), "entrance")
 end

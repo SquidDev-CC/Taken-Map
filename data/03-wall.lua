@@ -28,7 +28,7 @@ function setup(world)
 end
 
 function validate(world)
-	assert.eq(world.width, #world.find("wall"), "walls")
-	assert.eq(1, #world.find("exit"), "exit")
-	assert.eq(1, #world.find("entrance"), "entrance")
+	assert.eq(world.width, world.count("wall"), "walls")
+	assert.eq(1, world.count("exit"), "exit")
+	assert.eq(1, world.count("entrance"), "entrance")
 end

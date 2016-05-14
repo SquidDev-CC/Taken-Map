@@ -2,9 +2,13 @@ local asserts = require "shared.asserts"
 local blocks = require "server.world.blocks"
 local builder = require "server.world.builder"
 local command = require "server.command"
+local config = require "shared.config"
 local helpers = require "server.world.helpers"
 local map = require "server.world.map"
 local player = require "server.world.player"
+
+local deltas = { -config.checkOffset, config.checkOffset }
+local debugParticles = config.debugParticles
 
 local function sayPrint(...)
 	local args = { ... }
@@ -39,7 +43,7 @@ local function copy(table, cache, blacklist)
 end
 
 local function setupWorld(world)
-	local clone = copy(world, nil, {setup = true})
+	local clone = copy(world, nil, {setup = true, find = true})
 	helpers(clone)
 	return clone
 end
@@ -49,8 +53,7 @@ local function setupPlayer(player)
 	return clone
 end
 
-local function makeEnv()
-	local env = {}
+local function makeEnv(env)
 	env.print = sayPrint
 	env.pairs = pairs
 	env.ipairs = ipairs
@@ -70,7 +73,7 @@ return function(files)
 	if not file or not file.lines then error("Cannot find file", 0) end
 	local text = table.concat(file.lines, "\n")
 
-	local env = makeEnv()
+	local env = {}
 	local func, msg = load(text, file.name, nil, env)
 	if not func then error(msg or "Cannot load file", 0) end
 
@@ -83,9 +86,20 @@ return function(files)
 	local world = map()
 	local player = player()
 
-	if backup.setup then backup.setup(setupWorld(world), setupPlayer(player)) end
+	if backup.setup then
+		-- Setup the environment each time to prevent people from modifying tables
+		-- Looking at you @BombBloke
+		makeEnv(env)
+		backup.setup(setupWorld(world), setupPlayer(player))
+	end
+
+	makeEnv(env)
 	backup.generate(setupWorld(world), setupPlayer(player))
-	if backup.validate then backup.validate(setupWorld(world), setupPlayer(player)) end
+
+	if backup.validate then
+		makeEnv(env)
+		backup.validate(setupWorld(world), setupPlayer(player))
+	end
 
 	local map = world.setup()
 
@@ -98,35 +112,60 @@ return function(files)
 
 	return function(state)
 		local previousSuccess = false
-		while true do
-			-- m=!sp doesn't appear to work.
-			local success, msg = commands.execute("@r[m=a]", "~", "~", "~", "tp", "@p", "~", "~", "~")
-			if success then
-				local x, y, z = msg[1]:match("to ([-%d%.]+), ([-%d%.]+), ([-%d%.]+)")
-				if not x then print("Cannot extract position from " .. msg[1]) end
+		local function handle(x, z)
+			local row = map.data[x]
+			if row then
+				local blockData = row[z]
+				if blockData then
+					local block = blockData[1]
 
-				x, z = math.floor(x), math.floor(z)
-				local row = map.data[x]
-				if row then
-					local blockData = row[z]
-					if blockData then
-						local block = blockData[1]
-
-						if block == "exit" then
-							if backup.exit then
-								local success, msg = pcall(backup.exit, setupPlayer(player))
-								if success then
-									break
-								elseif not previousSuccess then
-									command.sayError(msg)
-								end
-								previousSuccess = true
-							else
-								break
+					if block == "exit" then
+						if backup.exit then
+							local success, msg = pcall(backup.exit, setupPlayer(player))
+							if success then
+								return true
+							elseif not previousSuccess then
+								command.sayError(msg)
 							end
-						elseif block then
-							block = blocks[block]
-							if block and block.hit then block.hit(x, z, player, unpack(blockData[3] or {})) end
+							previousSuccess = true
+						else
+							return true
+						end
+					elseif block then
+						block = blocks[block]
+						if block and block.hit then block.hit(x, z, player, unpack(blockData[3] or {})) end
+					end
+				end
+			end
+
+			return false
+		end
+
+		local noSuccess = true
+		while noSuccess do
+			local success, msg = commands.execute("@r[score_gamemode=0,score_gamemode_min=0]", "~", "~", "~", "tp", "@p", "~", "~", "~")
+			if success then
+				local oX, oY, oZ = msg[1]:match("to ([-%d%.]+), ([-%d%.]+), ([-%d%.]+)")
+				if not oX then print("Cannot extract position from " .. msg[1]) end
+				if debugParticles then
+					commands.async.particle("reddust", math.floor(oX) + 0.5, 65, math.floor(oZ) + 0.5, 0, 0, 0, 0, 20)
+				end
+
+				local visited = {}
+				for _, dX in ipairs(deltas) do
+					for _, dZ in ipairs(deltas) do
+						local x, z = math.floor(oX + dX), math.floor(oZ + dZ)
+						local key = x .. "_" .. z
+						if noSuccess and not visited[key] then
+							visited[key] = true
+
+							if debugParticles then
+								commands.async.particle("splash", x + 0.5, 65, z + 0.5, 0, 0, 0, 4, 20)
+							end
+
+							if handle(x, z) then
+								noSuccess = false
+							end
 						end
 					end
 				end

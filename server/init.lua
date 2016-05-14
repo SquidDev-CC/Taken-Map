@@ -27,8 +27,9 @@ while true do
 					files = levelFiles,
 				})
 			elseif data.action == "spectate" then
-				commands.gamemode("spectator", "@a")
-				commands.execute("@p ~ ~ ~ summon ArmorStand ~ ~1 ~ {Invisible:1,Invulnerable:1,NoGravity:1,NoBasePlate:1}")
+				commands.async.gamemode("spectator", "@a")
+				commands.async.scoreboard("players", "set", "@a", "gamemode", "1")
+				commands.async.execute("@p ~ ~ ~ summon ArmorStand ~ ~1 ~ {Invisible:1,Invulnerable:1,NoGravity:1,NoBasePlate:1}")
 				commands.native.execAsync([=[tellraw @a ["",{"text":"You are in Spectator mode "},{"text":"[Resume]","color":"dark_green","clickEvent":{"action":"run_command","value":"/setblock -5 64 0 minecraft:redstone_block"}}]]=])
 			end
 		end

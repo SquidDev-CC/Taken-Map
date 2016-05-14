@@ -76,10 +76,14 @@ return function()
 		current[2] = id
 	end
 
-	function world.count()
-		local counts = {}
+	function world.count(name)
+		if kind ~= nil then
+			if type(kind) ~= "string" then error("Bad argument #1: expected string, got " .. type(kind)) end
+			if not blocks[kind] then error("No such block " .. kind, 2) end
+		end
 
-		for name, _ in ipairs(blocks) do
+		local counts = {}
+		for name, _ in pairs(blocks) do
 			counts[name] = 0
 		end
 
@@ -87,11 +91,12 @@ return function()
 			local row = data[x]
 			for y = 1, height do
 				local value = row[y][1]
+				if not counts[value] then print(value) end
 				counts[value] = counts[value] + 1
 			end
 		end
 
-		return counts
+		if name then return counts[name] else return counts end
 	end
 
 	function world.find(kind)

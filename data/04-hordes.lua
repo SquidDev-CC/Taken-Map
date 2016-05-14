@@ -38,7 +38,7 @@ function setup(world)
 end
 
 function validate(world)
-	assert.eq(3, #world.find("zombie"), "zombies")
-	assert.eq(1, #world.find("exit"), "exit")
-	assert.eq(1, #world.find("entrance"), "entrance")
+	assert.eq(3, world.count("zombie"), "zombies")
+	assert.eq(1, world.count("exit"), "exit")
+	assert.eq(1, world.count("entrance"), "entrance")
 end
