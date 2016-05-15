@@ -4,6 +4,10 @@ local command = require "server.command"
 local network = require "shared.network"(config.clientId)
 local levels = require "server.loader"
 
+commands.async.scoreboard("objectives add gamemode dummy gamemode")
+commands.async.scoreboard("players", "reset", "@a")
+commands.async.scoreboard("players", "set", "@a", "gamemode", "0")
+
 local level = tonumber(... or 1) or 1
 while true do
 	local levelFiles = levels[level] or error("No such level " .. level)
