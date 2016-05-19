@@ -58,18 +58,17 @@ end
 
 include(fs.combine(root, "client"))
 include(fs.combine(root, "shared"))
+include(fs.combine(root, "server"))
+include(fs.combine(root, "init.lua"))
+
 local args = { ... }
 
 local original = term.current()
 term.redirect(term.native())
 
 local success = xpcall(function()
-	preload["client.loop"](unpack(args))
+	preload["init"](unpack(args))
 end, function(err)
-	term.redirect(original)
-	term.setCursorPos(1, 1)
-	term.setBackgroundColor(colors.black)
-	term.clear()
 	printError(err)
 	for i = 3, 15 do
 		local _, msg = pcall(error, "", i)
@@ -78,4 +77,4 @@ end, function(err)
 	end
 end)
 
-if not success then error() end
+if not success then error("Exited with errors") end

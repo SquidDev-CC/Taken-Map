@@ -10,14 +10,34 @@ local server = Files()
 	:Include "wild:shared/*.lua"
 	:Startup "server/init.lua"
 
-Tasks:Clean("clean", "build")
+Tasks:clean()
 
-local config = dofile(File "shared/config.lua")
-Tasks:AsRequire("client", client, "build/" .. config.clientId .. "/startup")
-Tasks:AsRequire("server", server, "build/" .. config.serverId .. "/startup")
-Tasks:AddTask("data", {}, function()
-	fs.copy(File "data", File("build/" .. config.serverId .. "/data"))
-end):Description "Copy levels to output folder"
+Tasks:asRequire "main" (function(source)
+	source:include {
+		"server/*.lua",
+		"shared/*.lua",
+		"client/*.lua",
+		"init.lua",
+	}
 
-Tasks:Task "build" {"clean", "client", "server", "data"}
+	source:exclude {
+		"*/build/*",
+		"Howlfile.lua",
+	}
+
+	source:from "build" :include "levels.lua"
+	source:startup "init.lua"
+	source:output "build/Taken.lua"
+end):requires "build/levels.lua"
+
+Tasks:AddTask("data", function()
+	local runner = dofile(File "server/loader.lua")
+	local contents = runner(File "data")
+	local fs = require "howl.platform".fs
+	local serialize = require "howl.lib.dump".serialise
+	fs.write(File "build/levels.lua", "return " .. serialize(contents))
+end)
+	:Produces "build/levels.lua"
+
+Tasks:Task "build" {"clean", "main" }
 Tasks:Default "build"

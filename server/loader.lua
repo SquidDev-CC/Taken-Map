@@ -32,8 +32,7 @@ local function parse(path, name)
 	}
 end
 
-local levelDir = fs.combine(fs.getDir(shell.getRunningProgram()), "data")
-if fs.exists(levelDir) then
+return function(levelDir)
 	local levelNames = fs.list(levelDir)
 	table.sort(levelNames)
 
@@ -43,6 +42,4 @@ if fs.exists(levelDir) then
 	end
 
 	return levels
-else
-	return require "server.levels"
 end

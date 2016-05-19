@@ -1,6 +1,5 @@
 local editor = require "client.editor"
-local config = require "shared.config"
-local network = require "shared.network"(config.serverId)
+local network = require "shared.network"()
 
 local files = {
 	{

@@ -104,7 +104,7 @@ return {
 							display = {
 								Name = "Your computer"
 							},
-							computerID = assert(config.clientId),
+							computerID = os.getComputerID(),
 							upgrade = 1,
 						}
 					}

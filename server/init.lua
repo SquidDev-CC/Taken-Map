@@ -1,8 +1,17 @@
 local sandbox = require "server.sandbox"
-local config = require "shared.config"
 local command = require "server.command"
-local network = require "shared.network"(config.clientId)
-local levels = require "server.loader"
+local network = require "shared.network"()
+
+local levels
+do
+	local success
+	success, levels = pcall(require, "levels")
+	if not success then
+		local loader = require "server.loader"
+		local dir = fs.combine(fs.getDir(shell.getRunningProgram()), "data")
+		levels = loader(dir)
+	end
+end
 
 commands.async.scoreboard("objectives add gamemode dummy gamemode")
 commands.async.scoreboard("players", "reset", "@a")

@@ -1,9 +1,4 @@
 return {
-	--- Id for the editor
-	clientId = 1,
-	--- Id for the command computer
-	serverId = 0,
-
 	map = {
 		--- Bottom of the map: the floor the player stands on
 		bottom = 64,
