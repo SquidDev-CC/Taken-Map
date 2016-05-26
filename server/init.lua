@@ -1,6 +1,7 @@
+local position = require "server.position"
 local sandbox = require "server.sandbox"
 local command = require "server.command"
-local network = require "shared.network"()
+local setup = require "server.setup"
 
 local levels
 do
@@ -16,6 +17,39 @@ end
 commands.async.scoreboard("objectives add gamemode dummy gamemode")
 commands.async.scoreboard("players", "reset", "@a")
 commands.async.scoreboard("players", "set", "@a", "gamemode", "0")
+
+if not fs.exists(".taken") then
+	print("No dump file found. Generate world? [y/n]")
+	local result
+	while result == nil do
+		local _, contents = os.pullEvent("char")
+		contents = contents:lower()
+		if contents == "y" or contents == "yes" then
+			result = true
+		elseif contents == "n" or contents == "no" then
+			result = false
+		else
+			print("Please enter y or n (got " .. contents .. ")")
+		end
+	end
+
+	position.setup()
+
+	if result then
+		setup()
+	end
+
+	do return end
+else
+	local handle = fs.open(".taken", "r")
+	local contents = handle.readAll()
+	handle.close()
+
+	local config = textutils.deserialize(contents)
+	position.setup(config)
+end
+
+local network = require "shared.network"()
 
 local level = tonumber(... or 1) or 1
 while true do
