@@ -1,5 +1,4 @@
 local position = require "server.position"
-local sandbox = require "server.sandbox"
 local command = require "server.command"
 local setup = require "server.setup"
 
@@ -18,6 +17,7 @@ commands.async.scoreboard("objectives add gamemode dummy gamemode")
 commands.async.scoreboard("players", "reset", "@a")
 commands.async.scoreboard("players", "set", "@a", "gamemode", "0")
 
+local config
 if not fs.exists(".taken") then
 	print("No dump file found. Generate world? [y/n]")
 	local result
@@ -33,25 +33,31 @@ if not fs.exists(".taken") then
 		end
 	end
 
-	position.setup()
-
 	if result then
-		setup()
+		local x, y, z = position.setup()
+		config = {
+			x = x, y = y, z = z,
+			level = 0,
+		}
 	end
 
-	do return end
+	local handle = assert(fs.open(".taken", "w"))
+	handle.write(textutils.serialize(config))
+	handle.close()
 else
 	local handle = fs.open(".taken", "r")
 	local contents = handle.readAll()
 	handle.close()
 
-	local config = textutils.deserialize(contents)
+	config = textutils.unserialize(contents)
 	position.setup(config)
 end
 
-local network = require "shared.network"()
 
-local level = tonumber(... or 1) or 1
+local network = require "shared.network"()
+local sandbox = require "server.sandbox"
+
+local level = tonumber(... or nil) or config.level or 1
 while true do
 	local levelFiles = levels[level] or error("No such level " .. level)
 	network.send({
@@ -63,6 +69,7 @@ while true do
 
 	local state = { active = true }
 	local function updateFiles()
+		local x, y, z = commands.getBlockPosition()
 		while true do
 			local data = network.receive()
 			if data.action == "execute" then
@@ -77,7 +84,22 @@ while true do
 				commands.async.gamemode("spectator", "@a")
 				commands.async.scoreboard("players", "set", "@a", "gamemode", "1")
 				commands.async.execute("@p ~ ~ ~ summon ArmorStand ~ ~1 ~ {Invisible:1,Invulnerable:1,NoGravity:1,NoBasePlate:1}")
-				commands.native.execAsync([=[tellraw @a ["",{"text":"You are in Spectator mode "},{"text":"[Resume]","color":"dark_green","clickEvent":{"action":"run_command","value":"/setblock -5 64 0 minecraft:redstone_block"}}]]=])
+				commands.native.execAsync(([=[tellraw @a ["",{"text":"You are in Spectator mode "},{"text":"[Resume]","color":"dark_green","clickEvent":{"action":"run_command","value":"/setblock %d %d %d minecraft:redstone_block"}}]]=]):format(x, y - 1, z))
+			end
+		end
+	end
+
+	local function updateSpectator()
+		local x, y, z = commands.getBlockPosition()
+		while true do
+			os.pullEvent("redstone")
+			if rs.getInput("bottom") then
+				commands.async.tp("@a", "@e[type=ArmorStand]")
+				commands.async.gamemode("survival", "@a")
+				commands.async.gamemode("creative", "ThatVeggie")
+				commands.async.scoreboard("players", "set", "@a", "gamemode", "0")
+				commands.async.kill("@e[type=ArmorStand]")
+				commands.async.setblock(x, y -1, z, "minecraft:air")
 			end
 		end
 	end
@@ -96,7 +118,7 @@ while true do
 						command.sayError(message)
 					end
 				end,
-				updateFiles
+				updateFiles, updateSpectator
 			)
 		else
 			command.sayError(result)
@@ -108,4 +130,10 @@ while true do
 			end
 		end
 	end
+
+	local handle = fs.open(".taken", "w")
+	config.level = level
+	command.say("Writing level " .. level)
+	handle.write(textutils.serialize(config))
+	handle.close()
 end

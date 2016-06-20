@@ -1,8 +1,10 @@
 local config = require "shared.config"
 local command = require "server.command"
+local mX, mY, mZ = require "server.position".get()
 
 local summon = command.wrap "summon"
 local kill = command.wrap "kill"
+local top, bottom = mY + config.map.ceiling - 1, mY
 
 local function getColor(color)
 	if color == "red" then return 14, color
@@ -20,6 +22,7 @@ return {
 	lava  = { blocks = { "minecraft:lava" },  decorate = false, },
 	platform = {
 		build = function(x, y, builder, height)
+			print("Pos", x, height + 2, y)
 			builder[x][height + 2][y] = "minecraft:stained_glass 1"
 		end,
 		args = function(height)
@@ -85,7 +88,7 @@ return {
 	zombie = {
 		build = function(x, y)
 			-- Slightly OP. Eh.
-			summon("Zombie", x, config.map.bottom + 1, y,[=[{Attributes:[{Name:generic.attackDamage,Base:100},{Name:generic.movementSpeed,Base:0.5}],Equipment:[{id:"diamond_sword",damage:0,ench:[{id:8,lvl:20}]},{},{},{},{id:"leather_helmet",damage:0,ench:[{id:16,lvl:20}]}],Invulnerable:1,ActiveEffects:[{Id:17,Amplifier:"",Duration:"",ShowParticles:0b}]}]=])
+			summon("Zombie", mX + x, bottom, mZ + y,[=[{Attributes:[{Name:generic.attackDamage,Base:100},{Name:generic.movementSpeed,Base:0.5}],Equipment:[{id:"diamond_sword",damage:0,ench:[{id:8,lvl:20}]},{},{},{},{id:"leather_helmet",damage:0,ench:[{id:16,lvl:20}]}],Invulnerable:1,ActiveEffects:[{Id:17,Amplifier:"",Duration:"",ShowParticles:0b}]}]=])
 		end,
 		decorate = true,
 	},
@@ -93,7 +96,7 @@ return {
 		decorate = true,
 		build = function(x, y)
 			summon(
-				"Item", x, config.map.bottom + 1, y,
+				"Item", mX + x, bottom, mY + y,
 				{
 					Age = -32768, -- No despawn
 					Item = {

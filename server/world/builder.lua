@@ -2,6 +2,7 @@ local config = require "shared.config"
 local blocks = require "server.world.blocks"
 local filler = require "server.world.filler"
 local command = require "server.command".wrap
+local mX, mY, mZ = require "server.position".get()
 
 local kill = command "kill"
 local fill = command "fill"
@@ -11,12 +12,14 @@ local gamemode = command "gamemode"
 local title = command "title"
 
 local width, height = config.map.width, config.map.height
-local top, bottom = config.map.top, config.map.bottom
+local top, bottom = mY + config.map.ceiling - 1, mY
+local spawnOffset = config.map.spawnOffset
+local buildOffset = config.map.buildOffset
 local offset = 2
 
 local function build(map)
 	local mapData = map.data
-	local world = filler.create(width, top - bottom + offset, height)
+	local world = filler.create(width, config.map.ceiling + offset + 1, height)
 
 	map.env.setup(world, map)
 
@@ -51,22 +54,22 @@ local function build(map)
 	end
 
 	filler.optimise(world)
-	filler.build(world, 0, bottom - offset, 0)
+	filler.build(world, mX, bottom - offset - 1, mZ)
 end
 
 local function clear(map)
 	kill("@e[type=!Player]")
-	tp("@a", 2, config.map.bottom + 1, -2)
-	fill(1, config.map.bottom - 1, 1, width, config.map.bottom, height, map.env.base)
-	fill(1, config.map.bottom + 1, 1, width, config.map.top, height, "minecraft:air")
+	spawnpoint("@a", mX + buildOffset[1], bottom, mZ + buildOffset[2])
+	fill(mX + 1, bottom - 2, mZ + 1, mX + width, bottom - 1, mZ + height, map.env.base)
+	fill(mX + 1, bottom,     mZ + 1, mX + width, top,        mZ + height, "minecraft:air")
 end
 
 local function setup(map)
 	local entrance = map.entrance
 
 	gamemode("adventure", "@a[name=!ThatVeggie]")
-	tp("@a", entrance[1], config.map.bottom + 1, entrance[2])
-	spawnpoint("@a", 6, config.map.bottom + 1, -2)
+	tp("@a", mX + entrance[1], bottom, mZ + entrance[2])
+	spawnpoint("@a", mX + spawnOffset[1], bottom, mZ + spawnOffset[2])
 	title("@a", "title", {text=map.title})
 	title("@a", "subtitle", {text=map.subtitle})
 end

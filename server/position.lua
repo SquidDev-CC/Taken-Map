@@ -8,11 +8,12 @@ return {
 	-- Get the origin of the map.
 	-- The y coordinate is 3 above the absolute base
 	get = function()
-		if not x then error("Positions are not setup") end
+		if not x then error("Positions have not been set") end
 		return x, y, z
 	end,
 
 	setup = function(config)
+		if x then error("Positions have already been set") end
 		if config then
 			x = config.x
 			y = config.y
@@ -32,5 +33,7 @@ return {
 				error("Unknown direction " .. tostring(facing))
 			end
 		end
+
+		return x, y, z
 	end,
 }

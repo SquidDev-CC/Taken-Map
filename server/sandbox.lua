@@ -7,6 +7,7 @@ local helpers = require "server.world.helpers"
 local map = require "server.world.map"
 local parse = require "server.parse"
 local player = require "server.world.player"
+local mX, mY, mZ = require "server.position".get()
 
 local deltas = { -config.checkOffset, config.checkOffset }
 local debugParticles = config.debugParticles
@@ -173,10 +174,14 @@ return function(files)
 		while noSuccess do
 			local success, msg = commands.execute("@r[score_gamemode=0,score_gamemode_min=0]", "~", "~", "~", "tp", "@p", "~", "~", "~")
 			if success then
-				local oX, oY, oZ = msg[1]:match("to ([-%d%.]+), ([-%d%.]+), ([-%d%.]+)")
+				local oX, _, oZ = msg[1]:match("to ([-%d%.]+), ([-%d%.]+), ([-%d%.]+)")
 				if not oX then print("Cannot extract position from " .. msg[1]) end
+
+				oX = oX - mX
+				oZ = oZ - mZ
+
 				if debugParticles then
-					commands.async.particle("reddust", math.floor(oX) + 0.5, 65, math.floor(oZ) + 0.5, 0, 0, 0, 0, 20)
+					commands.async.particle("reddust", math.floor(oX + mX) + 0.5, mY, math.floor(oZ + mZ) + 0.5, 0, 0, 0, 0, 20)
 				end
 
 				local visited = {}
@@ -188,7 +193,7 @@ return function(files)
 							visited[key] = true
 
 							if debugParticles then
-								commands.async.particle("splash", x + 0.5, 65, z + 0.5, 0, 0, 0, 4, 20)
+								commands.async.particle("splash", mX + x + 0.5, mY, mZ + z + 0.5, 0, 0, 0, 4, 20)
 							end
 
 							if handle(x, z) then
