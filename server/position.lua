@@ -22,13 +22,13 @@ return {
 			x, y, z = commands.getBlockPosition()
 			local facing = commands.getBlockInfo(x, y, z).state.facing
 			if facing == "west" then
-				x = x + 1
+				x = x + 3
 			elseif facing == "east" then
-				x = x - w - 1
+				x = x - w - 3
 			elseif facing == "north" then
-				z = z + 1
+				z = z + 3
 			elseif facing == "south" then
-				z = z - h - 1
+				z = z - h - 3
 			else
 				error("Unknown direction " .. tostring(facing))
 			end

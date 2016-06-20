@@ -22,7 +22,6 @@ return {
 	lava  = { blocks = { "minecraft:lava" },  decorate = false, },
 	platform = {
 		build = function(x, y, builder, height)
-			print("Pos", x, height + 2, y)
 			builder[x][height + 2][y] = "minecraft:stained_glass 1"
 		end,
 		args = function(height)
@@ -96,7 +95,7 @@ return {
 		decorate = true,
 		build = function(x, y)
 			summon(
-				"Item", mX + x, bottom, mY + y,
+				"Item", mX + x, bottom, mZ + y,
 				{
 					Age = -32768, -- No despawn
 					Item = {

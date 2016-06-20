@@ -7,8 +7,8 @@ return {
 		--- Height of the map
 		height = 24,
 
-		spawnOffset = { 2, -3 },
-		buildOffset = { 7, -3 },
+		spawnOffset = { 4, -3 },
+		buildOffset = { 9, -3 },
 	},
 	--- Debug fill commands
 	debugFill = false,

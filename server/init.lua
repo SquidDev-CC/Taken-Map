@@ -35,10 +35,13 @@ if not fs.exists(".taken") then
 
 	if result then
 		local x, y, z = position.setup()
+		setup()
 		config = {
 			x = x, y = y, z = z,
-			level = 0,
+			level = 1,
 		}
+	else
+		return
 	end
 
 	local handle = assert(fs.open(".taken", "w"))
@@ -57,7 +60,7 @@ end
 local network = require "shared.network"()
 local sandbox = require "server.sandbox"
 
-local level = tonumber(... or nil) or config.level or 1
+local level = tonumber(arg[1]) or config.level or 1
 while true do
 	local levelFiles = levels[level] or error("No such level " .. level)
 	network.send({
@@ -133,7 +136,6 @@ while true do
 
 	local handle = fs.open(".taken", "w")
 	config.level = level
-	command.say("Writing level " .. level)
 	handle.write(textutils.serialize(config))
 	handle.close()
 end

@@ -68,11 +68,11 @@ return function()
 	hollowBlock(x, y, z, w, c, h)
 
 	-- Pods
-	hollowBlock(x,     y, z - 5, 3, 3, 3)
-	hollowBlock(x + 5, y, z - 5, 3, 3, 3)
+	hollowBlock(x + map.spawnOffset[1] - 2,     y, z  + map.spawnOffset[2] - 2, 3, 3, 3)
+	hollowBlock(x + map.buildOffset[1] - 2,     y, z  + map.buildOffset[2] - 2, 3, 3, 3)
 
-	setBlock(x + 2, y + 1, z - 2, "minecraft:wall_sign", 0, "replace", {Text2 = "You died", Text3 = "Try again"})
-	setBlock(x + 7, y + 1, z - 2, "minecraft:wall_sign", 0, "replace", {Text2 = "Building in", Text3 = "progress"})
+	setBlock(x + map.spawnOffset[1], y + 1, z + map.spawnOffset[2] + 1, "minecraft:wall_sign", 0, "replace", {Text2 = "You died", Text3 = "Try again"})
+	setBlock(x + map.buildOffset[1], y + 1, z + map.buildOffset[2] + 1, "minecraft:wall_sign", 0, "replace", {Text2 = "Building in", Text3 = "progress"})
 
 	-- Beacon base
 	fill(x, y - 3, z, x + w + 1, y - 3, z + h + 1, "minecraft:iron_block")
