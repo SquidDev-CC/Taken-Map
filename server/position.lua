@@ -3,6 +3,7 @@ local map = require "shared.config".map
 local w, h = map.width, map.height
 
 local x, y, z
+local spawnX, spawnY, spawnZ
 
 return {
 	-- Get the origin of the map.
@@ -12,28 +13,16 @@ return {
 		return x, y, z
 	end,
 
+	--- Get the respawn point of the map
+	getSpawn = function()
+		if not x then error("Positions have not been set") end
+		return spawnX, spawnY, spawnZ
+	end,
+
 	setup = function(config)
 		if x then error("Positions have already been set") end
-		if config then
-			x = config.x
-			y = config.y
-			z = config.z
-		else
-			x, y, z = commands.getBlockPosition()
-			local facing = commands.getBlockInfo(x, y, z).state.facing
-			if facing == "west" then
-				x = x + 3
-			elseif facing == "east" then
-				x = x - w - 3
-			elseif facing == "north" then
-				z = z + 3
-			elseif facing == "south" then
-				z = z - h - 3
-			else
-				error("Unknown direction " .. tostring(facing))
-			end
-		end
 
-		return x, y, z
+		x, y, z = unpack(config.build)
+		spawnX, spawnY, spawnZ = unpack(config.spawn)
 	end,
 }

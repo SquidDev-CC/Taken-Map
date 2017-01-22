@@ -174,30 +174,33 @@ return function(files)
 		while noSuccess do
 			local success, msg = commands.execute("@r[score_gamemode=0,score_gamemode_min=0]", "~", "~", "~", "tp", "@p", "~", "~", "~")
 			if success then
-				local oX, _, oZ = msg[1]:match("to ([-%d%.]+), ([-%d%.]+), ([-%d%.]+)")
+				local oX, oY, oZ = msg[1]:match("to ([-%d%.]+), ([-%d%.]+), ([-%d%.]+)")
 				if not oX then print("Cannot extract position from " .. msg[1]) end
 
 				oX = oX - mX
+				oY = oY - mY
 				oZ = oZ - mZ
 
 				if debugParticles then
 					commands.async.particle("reddust", math.floor(oX + mX) + 0.5, mY, math.floor(oZ + mZ) + 0.5, 0, 0, 0, 0, 20)
 				end
 
-				local visited = {}
-				for _, dX in ipairs(deltas) do
-					for _, dZ in ipairs(deltas) do
-						local x, z = math.floor(oX + dX), math.floor(oZ + dZ)
-						local key = x .. "_" .. z
-						if noSuccess and not visited[key] then
-							visited[key] = true
+				if oY >= 0 and oY <= config.map.ceiling then
+					local visited = {}
+					for _, dX in ipairs(deltas) do
+						for _, dZ in ipairs(deltas) do
+							local x, z = math.floor(oX + dX), math.floor(oZ + dZ)
+							local key = x .. "_" .. z
+							if noSuccess and not visited[key] then
+								visited[key] = true
 
-							if debugParticles then
-								commands.async.particle("splash", mX + x + 0.5, mY, mZ + z + 0.5, 0, 0, 0, 4, 20)
-							end
+								if debugParticles then
+									commands.async.particle("splash", mX + x + 0.5, mY, mZ + z + 0.5, 0, 0, 0, 4, 20)
+								end
 
-							if handle(x, z) then
-								noSuccess = false
+								if handle(x, z) then
+									noSuccess = false
+								end
 							end
 						end
 					end

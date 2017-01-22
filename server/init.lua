@@ -34,12 +34,7 @@ if not fs.exists(".taken") then
 	end
 
 	if result then
-		local x, y, z = position.setup()
-		setup()
-		config = {
-			x = x, y = y, z = z,
-			level = 1,
-		}
+		config = setup()
 	else
 		return
 	end
@@ -53,9 +48,9 @@ else
 	handle.close()
 
 	config = textutils.unserialize(contents)
-	position.setup(config)
 end
 
+position.setup(config)
 
 local network = require "shared.network"()
 local sandbox = require "server.sandbox"
@@ -99,7 +94,7 @@ while true do
 			if rs.getInput("bottom") then
 				commands.async.tp("@a", "@e[type=ArmorStand]")
 				commands.async.gamemode("survival", "@a")
-				commands.async.gamemode("creative", "ThatVeggie")
+				commands.async.gamemode("creative", "SquidDev")
 				commands.async.scoreboard("players", "set", "@a", "gamemode", "0")
 				commands.async.kill("@e[type=ArmorStand]")
 				commands.async.setblock(x, y -1, z, "minecraft:air")

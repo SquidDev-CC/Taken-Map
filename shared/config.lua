@@ -3,12 +3,9 @@ return {
 		-- Height of the world
 		ceiling = 7,
 		--- Width of the map
-		width = 24,
+		width = 25,
 		--- Height of the map
-		height = 24,
-
-		spawnOffset = { 4, -3 },
-		buildOffset = { 9, -3 },
+		height = 25,
 	},
 	--- Debug fill commands
 	debugFill = false,
@@ -17,5 +14,4 @@ return {
 	checkOffset = 0.05,
 	--- Display debug particles
 	debugParticles = false,
-
 }

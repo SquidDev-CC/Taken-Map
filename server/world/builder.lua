@@ -3,6 +3,7 @@ local blocks = require "server.world.blocks"
 local filler = require "server.world.filler"
 local command = require "server.command".wrap
 local mX, mY, mZ = require "server.position".get()
+local sX, sY, sZ = require "server.position".getSpawn()
 
 local kill = command "kill"
 local fill = command "fill"
@@ -13,8 +14,6 @@ local title = command "title"
 
 local width, height = config.map.width, config.map.height
 local top, bottom = mY + config.map.ceiling - 1, mY
-local spawnOffset = config.map.spawnOffset
-local buildOffset = config.map.buildOffset
 local offset = 2
 
 local function build(map)
@@ -59,7 +58,11 @@ end
 
 local function clear(map)
 	kill("@e[type=!Player]")
-	spawnpoint("@a", mX + buildOffset[1], bottom, mZ + buildOffset[2])
+	kill("@e[type=!Player]") -- Do it twice to clear items
+
+	tp("@a", mX + sX, sY, sZ)
+	title("@a", "title", "Please stand by")
+	title("@a", "subtitle", "Splies are reticulated")
 	fill(mX + 1, bottom - 2, mZ + 1, mX + width, bottom - 1, mZ + height, map.env.base)
 	fill(mX + 1, bottom,     mZ + 1, mX + width, top,        mZ + height, "minecraft:air")
 end
@@ -67,9 +70,9 @@ end
 local function setup(map)
 	local entrance = map.entrance
 
-	gamemode("adventure", "@a[name=!ThatVeggie]")
+	gamemode("adventure", "@a[name=!SquidDev]")
 	tp("@a", mX + entrance[1], bottom, mZ + entrance[2])
-	spawnpoint("@a", mX + spawnOffset[1], bottom, mZ + spawnOffset[2])
+	spawnpoint("@a", sX, sY, sZ)
 	title("@a", "title", {text=map.title})
 	title("@a", "subtitle", {text=map.subtitle})
 end

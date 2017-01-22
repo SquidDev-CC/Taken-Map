@@ -17,6 +17,13 @@ local function particle(x, y, z)
 	commands.async.particle("reddust", x + 0.5, y, z + 0.6, 0, 0, 0, 0, 20)
 end
 
+local deltas = {
+	north = { -0.5,  0, -1,   -1 },
+	south = { -0.5,  0,  1,   -1 },
+	east  = { -1,   -1, -0.5,  0 },
+	west  = {  1,   -1, -0.5,  0 },
+}
+
 local function particles(x, y, z)
 	-- Fancy particle effects to show where we are going to build
 	for x = x, x + w do
@@ -41,12 +48,12 @@ local function particles(x, y, z)
 	end
 end
 
-local function hollowBlock(x, y, z, w, c, h)
+local function hollowBlock(x, y, z, w, c, h, a)
 	-- Walls
-	fill(x,         y, z,         x + w + 1, y + c, z,         block)
-	fill(x,         y, z,         x,         y + c, z + h + 1, block)
-	fill(x,         y, z + h + 1, x + w + 1, y + c, z + h + 1, block)
-	fill(x + w + 1, y, z,         x + w + 1, y + c, z + h,     block)
+	fill(x,         y, z,         x + w + 1, y + c + a, z,         block)
+	fill(x,         y, z,         x,         y + c + a, z + h + 1, block)
+	fill(x,         y, z + h + 1, x + w + 1, y + c + a, z + h + 1, block)
+	fill(x + w + 1, y, z,         x + w + 1, y + c + a, z + h,     block)
 
 	-- Glass Ceiling
 	fill(x + 1, y + c, z + 1, x + w, y + c, z + h, glass)
@@ -60,23 +67,30 @@ end
 
 return function()
 	local x, y, z = commands.getBlockPosition()
-	setBlock(x, y + 1, z, "computercraft:advanced_modem", 0)
+	local info = commands.getBlockInfo(x, y, z)
+	local facing = info.metadata
+	local facingStr = info.state.facing
 
-	x, y, z = position()
+	local delta = deltas[facingStr]
+	local dx, dz = delta[1], delta[3]
+
 	print("Generating")
 
-	hollowBlock(x, y, z, w, c, h)
-
-	-- Pods
-	hollowBlock(x + map.spawnOffset[1] - 2,     y, z  + map.spawnOffset[2] - 2, 3, 3, 3)
-	hollowBlock(x + map.buildOffset[1] - 2,     y, z  + map.buildOffset[2] - 2, 3, 3, 3)
-
-	setBlock(x + map.spawnOffset[1], y + 1, z + map.spawnOffset[2] + 1, "minecraft:wall_sign", 0, "replace", {Text2 = "You died", Text3 = "Try again"})
-	setBlock(x + map.buildOffset[1], y + 1, z + map.buildOffset[2] + 1, "minecraft:wall_sign", 0, "replace", {Text2 = "Building in", Text3 = "progress"})
+	local bx, by, bz = math.floor(x + dx * w), y - c - 1, math.floor(z + dz * h)
+	hollowBlock(bx, by, bz, w, c, h, 3)
 
 	-- Beacon base
-	fill(x, y - 3, z, x + w + 1, y - 3, z + h + 1, "minecraft:iron_block")
+	fill(bx, by - 3, bz, bx + w + 1, by - 3, bz + h + 1, "minecraft:iron_block")
 
-	sleep(0.3)
+	-- Modem
+	setBlock(x - delta[2], y, z - delta[4], "computercraft:advanced_modem", facing)
+
+	sleep(0.5)
 	print("Done!")
+
+	return {
+		level = 1,
+		build = { bx, by, bz },
+		spawn = { bx + math.floor(w * 0.5), y, bz + math.floor(h * 0.5) },
+	}
 end
