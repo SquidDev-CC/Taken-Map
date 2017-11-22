@@ -1199,11 +1199,11 @@ end
 
 return function(contents)
 	local lexed = LexLua(contents)
-	os.queueEvent("foo")
-	coroutine.yield("foo")
+	os.queueEvent("taken_sleep0")
+	coroutine.yield("taken_sleep0")
 
 	local parsed = ParseLua(lexed)
-	os.queueEvent("foo")
-	coroutine.yield("foo")
+	os.queueEvent("taken_sleep0")
+	coroutine.yield("taken_sleep0")
 	return parsed
 end

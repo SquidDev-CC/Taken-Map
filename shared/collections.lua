@@ -26,7 +26,31 @@ local function combine(left, right, func)
 	return out
 end
 
+local function copy(table, blacklist, cache)
+	if cache then
+		local val = cache[table]
+		if val then return val end
+	else
+		cache = {}
+	end
+
+	local out = {}
+	cache[table] = out
+	for k, v in pairs(table) do
+		if not blacklist or not blacklist[k] then
+			if type(v) == "table" then
+				out[k] = copy(v, blacklist, cache)
+			else
+				out[k] = v
+			end
+		end
+	end
+
+	return out
+end
+
 return {
 	range = range,
 	combine = combine,
+	copy = copy,
 }

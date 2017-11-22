@@ -1,24 +1,20 @@
-local config = require "shared.config"
 local blocks = require "server.world.blocks"
+local commands = require "server.commands"
 local filler = require "server.world.filler"
-local command = require "server.command".wrap
-local mX, mY, mZ = require "server.position".get()
-local sX, sY, sZ = require "server.position".getSpawn()
+local map = require "shared.config".map
+local origin = require "server.origin"
+local player = require "server.player"
 
-local kill = command "kill"
-local fill = command "fill"
-local tp = command "tp"
-local spawnpoint = command "spawnpoint"
-local gamemode = command "gamemode"
-local title = command "title"
+local map_x, map_y, map_z = origin.get()
+local spawn_x, spawn_y, spawn_z = origin.getSpawn()
 
-local width, height = config.map.width, config.map.height
-local top, bottom = mY + config.map.ceiling - 1, mY
+local width, height, ceiling = map.width, map.height, map.ceiling
+local top, bottom = map_y + map.ceiling - 1, map_y
 local offset = 2
 
 local function build(map)
 	local mapData = map.data
-	local world = filler.create(width, config.map.ceiling + offset + 1, height)
+	local world = filler.create(width, ceiling + offset + 1, height)
 
 	map.env.setup(world, map)
 
@@ -53,32 +49,35 @@ local function build(map)
 	end
 
 	filler.optimise(world)
-	filler.build(world, mX, bottom - offset - 1, mZ)
+	filler.build(world, map_x, bottom - offset - 1, map_z)
 end
 
-local function clear(map)
-	kill("@e[type=!Player]")
-	kill("@e[type=!Player]") -- Do it twice to clear items
+local function tearDown(map)
+	player.tp(spawn_x, spawn_y, spawn_z)
+	commands.async.title(player.player_selector, "title", "Please stand by")
+	commands.async.title(player.player_selector, "subtitle", "Splines are being reticulated")
 
-	tp("@a", mX + sX, sY, sZ)
-	title("@a", "title", "Please stand by")
-	title("@a", "subtitle", "Splies are reticulated")
-	fill(mX + 1, bottom - 2, mZ + 1, mX + width, bottom - 1, mZ + height, map.env.base)
-	fill(mX + 1, bottom,     mZ + 1, mX + width, top,        mZ + height, "minecraft:air")
+	-- TODO: This should only kill within the bounds of the region
+	commands.async.kill("@e[type=!Player,name=!taken_placeholder]")
+	commands.async.kill("@e[type=!Player,name=!taken_placeholder]") -- Do it twice to clear items
+
+	--- Reset the floor & clear the main area
+	commands.async.fill(map_x + 1, bottom - 2, map_z + 1, map_x + width, bottom - 1, map_z + height, map.env.base)
+	commands.async.fill(map_x + 1, bottom,     map_z + 1, map_x + width, top,        map_z + height, "minecraft:air")
 end
 
 local function setup(map)
 	local entrance = map.entrance
 
-	gamemode("adventure", "@a[name=!SquidDev]")
-	tp("@a", mX + entrance[1], bottom, mZ + entrance[2])
-	spawnpoint("@a", sX, sY, sZ)
-	title("@a", "title", {text=map.title})
-	title("@a", "subtitle", {text=map.subtitle})
+	commands.async.gamemode("adventure", "@a[name=!SquidDev]") -- Am I evil? Yes.
+	player.tp(map_x + entrance[1], bottom, map_z + entrance[2])
+	commands.async.spawnpoint(player.player_selector, spawn_x, spawn_y, spawn_z)
+	commands.async.title(player.player_selector, "title", {text=map.title})
+	commands.async.title(player.player_selector, "subtitle", {text=map.subtitle})
 end
 
 return {
+	tearDown = tearDown,
 	build = build,
-	clear = clear,
 	setup = setup,
 }

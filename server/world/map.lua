@@ -1,9 +1,9 @@
-local config = require "shared.config"
 local blocks = require "server.world.blocks"
 local decorations = require "server.world.decorations"
 local environment = require "server.world.environment"
+local map = require "shared.config".map
 
-local width, height = config.map.width, config.map.height
+local width, height, ceiling = map.width, map.height, map.ceiling
 
 return function()
 	local data = {}
@@ -22,7 +22,7 @@ return function()
 
 	world.width = width
 	world.height = height
-	world.ceiling = config.map.ceiling
+	world.ceiling = ceiling
 
 	function world.setEnvironment(kind)
 		local env = environment[kind]

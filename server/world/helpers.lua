@@ -2,6 +2,7 @@ local floor, abs = math.floor, math.abs
 
 return function(world)
 	local width, height = world.width, world.height
+
 	function world.distribute(count, kind, blacklist, ...)
 		if type(count) ~= "number" then error("Bad argument #1: expected number, got " .. type(count), 2) end
 		if type(kind) ~= "string" then error("Bad argument #2: expected string, got " .. type(kind), 2) end

@@ -12,5 +12,4 @@ for name, v in pairs(colours) do
 	if type(v) == "number" then add(name, v) end
 end
 
-
 return decorations

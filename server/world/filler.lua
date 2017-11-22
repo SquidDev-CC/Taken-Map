@@ -1,7 +1,6 @@
---- Fills the world with blocks
+--- commands.async.fills the world with blocks
 
-local command = require "server.command".wrap
-local fill = command("fill", require "shared.config".debugFill)
+local commands = require "server.commands"
 local type, assert = type, assert
 
 --- Create a new map data
@@ -118,14 +117,14 @@ local function build(data, xOff, yOff, zOff, blocks)
 						block = blocks[index]
 						index = index + 1
 					end
-					fill(x + xOff, y + yOff, z + zOff, x + xOff, y + yOff, z + zOff, block)
+					commands.async.fill(x + xOff, y + yOff, z + zOff, x + xOff, y + yOff, z + zOff, block)
 				elseif ty == "table" then
 					local blockName = block[1]
 					if blocks then
 						blockName = blocks[index]
 						index = index + 1
 					end
-					fill(
+					commands.async.fill(
 						x + xOff, y + yOff,z + zOff,
 						x + xOff + block[2] - 1, y + yOff + block[3] - 1, z + zOff + block[4] - 1,
 						blockName

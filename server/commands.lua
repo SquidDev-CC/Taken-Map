@@ -1,5 +1,6 @@
 local commands = commands
 
+--- Wrapper function for debugging commands
 local function wrap(name, wrap, verbose)
 	if not commands then verbose = true end
 	if wrap or verbose then
@@ -23,44 +24,33 @@ local function wrap(name, wrap, verbose)
 	end
 end
 
-local function many(commands)
-	local ids, count = {}, 0
-	for cmd, func in pairs(commands) do
-		local id = commands.native.execAsync(cmd)
-		ids[id] = func
-		count = count + 1
-	end
-
-	while count > 0 do
-		local _, id, errored, success, result = os.pullEvent("task_complete")
-		local func = ids[id]
-		if func then
-			count = count - 1
-			ids[id] = nil
-			if errored then
-				func(errored, success)
-			else
-				func(success, result)
-			end
-		end
-	end
-end
-
-local tellraw = wrap("tellraw")
 local function say(message)
 	print(message)
-	tellraw("@a", {"",{text=message,color="white"}})
+	commands.async.tellraw("@a", {"",{text=message,color="white"}})
 end
 
 local function sayError(message)
 	printError(message)
-	tellraw("@a", {"",{text=message,color="red"}})
+	commands.async.tellraw("@a", {"",{text=message,color="red"}})
+end
+
+local function sayPrint(...)
+	local args = { ... }
+	for i = 1, select('#', ...) do
+		args[i] = tostring(args[i])
+	end
+
+	commands.say(table.concat(args, " "))
 end
 
 return {
-	wrap = wrap,
-	many = many,
-
-	say = say,
+	say      = say,
 	sayError = sayError,
+	sayPrint = sayPrint,
+
+	getBlockPosition = commands.getBlockPosition,
+	getBlockInfo = commands.getBlockInfo,
+
+	async = commands.async,
+	sync = commands,
 }

@@ -1,21 +1,16 @@
-local position = require "server.position"
-local command = require "server.command"
-local setup = require "server.setup"
+local origin = require "server.origin"
+local player = require "server.player"
+local commands = require "server.commands"
 
+--- Load all our levels
 local levels
 do
-	local success
-	success, levels = pcall(require, "levels")
-	if not success then
-		local loader = require "server.loader"
-		local dir = fs.combine(fs.getDir(shell.getRunningProgram()), "data")
-		levels = loader(dir)
-	end
+	local loader = require "server.level.loader"
+	local dir = fs.combine(fs.getDir(shell.getRunningProgram()), "data")
+	levels = loader(dir)
 end
 
-commands.async.scoreboard("objectives add gamemode dummy gamemode")
-commands.async.scoreboard("players", "reset", "@a")
-commands.async.scoreboard("players", "set", "@a", "gamemode", "0")
+local modules = { origin, player }
 
 local config
 if not fs.exists(".taken") then
@@ -24,20 +19,20 @@ if not fs.exists(".taken") then
 	while result == nil do
 		local _, contents = os.pullEvent("char")
 		contents = contents:lower()
-		if contents == "y" or contents == "yes" then
+		if contents == "y" then
 			result = true
-		elseif contents == "n" or contents == "no" then
+		elseif contents == "n" then
 			result = false
 		else
 			print("Please enter y or n (got " .. contents .. ")")
 		end
 	end
 
-	if result then
-		config = setup()
-	else
-		return
-	end
+	if not result then return end
+
+	config = { }
+	for i = 1, #modules do modules[i].setup(config) end
+	sleep(0.5) -- Wait for setup functions to complete
 
 	local handle = assert(fs.open(".taken", "w"))
 	handle.write(textutils.serialize(config))
@@ -48,16 +43,21 @@ else
 	handle.close()
 
 	config = textutils.unserialize(contents)
+
+	for i = 1, #modules do modules[i].load(config) end
 end
 
-position.setup(config)
-
 local network = require "shared.network"()
-local sandbox = require "server.sandbox"
+local sandbox = require "server.level.runner"
 
-local level = tonumber(arg[1]) or config.level or 1
+local level = config.level or 1
 while true do
-	local levelFiles = levels[level] or error("No such level " .. level)
+	local levelFiles = levels[level]
+	if not levelFiles then
+		commands.sayError("No such level " .. level)
+		error("No such level " .. level)
+	end
+
 	network.send({
 		action = "files",
 		files = levelFiles,
@@ -79,25 +79,7 @@ while true do
 					files = levelFiles,
 				})
 			elseif data.action == "spectate" then
-				commands.async.gamemode("spectator", "@a")
-				commands.async.scoreboard("players", "set", "@a", "gamemode", "1")
-				commands.async.execute("@p ~ ~ ~ summon ArmorStand ~ ~1 ~ {Invisible:1,Invulnerable:1,NoGravity:1,NoBasePlate:1}")
-				commands.native.execAsync(([=[tellraw @a ["",{"text":"You are in Spectator mode "},{"text":"[Resume]","color":"dark_green","clickEvent":{"action":"run_command","value":"/setblock %d %d %d minecraft:redstone_block"}}]]=]):format(x, y - 1, z))
-			end
-		end
-	end
-
-	local function updateSpectator()
-		local x, y, z = commands.getBlockPosition()
-		while true do
-			os.pullEvent("redstone")
-			if rs.getInput("bottom") then
-				commands.async.tp("@a", "@e[type=ArmorStand]")
-				commands.async.gamemode("survival", "@a")
-				commands.async.gamemode("creative", "SquidDev")
-				commands.async.scoreboard("players", "set", "@a", "gamemode", "0")
-				commands.async.kill("@e[type=ArmorStand]")
-				commands.async.setblock(x, y -1, z, "minecraft:air")
+				player.startSpectating()
 			end
 		end
 	end
@@ -113,15 +95,20 @@ while true do
 						level = level + 1
 						running = false
 					else
-						command.sayError(message)
+						commands.sayError(message)
+
+						if levelFiles == files then
+							commands.sayError "Quitting. We hit an error in the original source."
+							error("Error in original source")
+						end
 					end
 				end,
-				updateFiles, updateSpectator
+				updateFiles
 			)
 		else
-			command.sayError(result)
+			commands.sayError(result)
 			if levelFiles == files then
-				command.sayError "Quitting. We hit an error in the original source."
+				commands.sayError "Quitting. We hit an error in the original source."
 				error("Error in original source")
 			else
 				updateFiles()

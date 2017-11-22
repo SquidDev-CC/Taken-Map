@@ -32,13 +32,13 @@ local function parse(path, name)
 	}
 end
 
-return function(levelDir)
-	local levelNames = fs.list(levelDir)
-	table.sort(levelNames)
+return function(level_dir)
+	local level_names = fs.list(level_dir)
+	table.sort(level_names)
 
 	local levels = {}
-	for i, levelName in ipairs(levelNames) do
-		levels[i] = { parse(fs.combine(levelDir, levelName), levelName) }
+	for i, level_name in ipairs(level_names) do
+		levels[i] = { parse(fs.combine(level_dir, level_name), level_name) }
 	end
 
 	return levels
