@@ -84,7 +84,11 @@ return {
 	zombie = {
 		build = function(x, y)
 			-- Slightly OP. Eh.
-			commands.async.summon("minecraft:zombie", map_x + x, bottom, map_z + y,[=[{Attributes:[{Name:generic.attackDamage,Base:100},{Name:generic.movementSpeed,Base:0.5}],Equipment:[{id:"diamond_sword",damage:0,ench:[{id:8,lvl:20}]},{},{},{},{id:"leather_helmet",damage:0,ench:[{id:16,lvl:20}]}],Invulnerable:1,ActiveEffects:[{Id:17,Amplifier:"",Duration:"",ShowParticles:0b}]}]=])
+			-- Movement Speed: 0.5
+			-- Damage: 100
+			-- Leather cap, Protection 20
+			-- Diamond sword, Sharpness 20
+			commands.async.summon("minecraft:zombie", map_x + x, bottom, map_z + y,[=[{Attributes:[{Name:"generic.movementSpeed",Base:0.5},{Name:"generic.attackDamage",Base:100}],HandItems:[{id:"minecraft:diamond_sword",tag:{ench:[{id:16,lvl:20}]},Count:1},{}],ArmorItems:[{},{},{},{id:"minecraft:leather_helmet",Count:1,tag:{ench:[{id:8,lvl:20}]}}]}]=])
 		end,
 		decorate = true,
 	},
