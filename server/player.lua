@@ -24,7 +24,7 @@ return {
 	--- Called on the initial setup
 	setup = function(config)
 		commands.async.scoreboard("objectives", "add", "taken_playing", "dummy", "State")
-		commands.async.scoreboard("objectives", "add", "taken_gm", "dummy", "Taken gamemode trigger")
+		commands.async.scoreboard("objectives", "add", "taken_gm", "trigger", "Taken gamemode trigger")
 
 		commands.async.gamerule("keepInventory", "true")
 
