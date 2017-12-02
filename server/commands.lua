@@ -1,5 +1,12 @@
 local commands = commands
 
+local function setup(config)
+	commands.gamerule("commandBlockOutput", false)
+end
+
+local function load(config)
+end
+
 --- Wrapper function for debugging commands
 local function wrap(name, wrap, verbose)
 	if not commands then verbose = true end
@@ -44,6 +51,9 @@ local function sayPrint(...)
 end
 
 return {
+	setup    = setup,
+	load     = load,
+
 	say      = say,
 	sayError = sayError,
 	sayPrint = sayPrint,

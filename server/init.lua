@@ -10,7 +10,7 @@ do
 	levels = loader(dir)
 end
 
-local modules = { origin, player }
+local modules = { commands, origin, player }
 
 local config
 if not fs.exists(".taken") then
