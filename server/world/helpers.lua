@@ -66,6 +66,7 @@ return function(world)
 		if steep then
 			dy, dx = dx, dy
 		end
+		local add_before = dy / dx >= 0.5
 
 		local e = 2 * dy - dx
 		local x, y = x_1, y_1
@@ -78,9 +79,15 @@ return function(world)
 			pixel(x, y, kind, ...)
 			while e >= 0 do
 				if steep then
+					-- Attempt to fill in the corners of lines. We use the
+					-- current gradient to determine where looks "best".
+					if add_before then pixel(x, y + signy, kind, ...) end
 					x = x + signx
+					if not add_before then pixel(x, y, kind, ...) end
 				else
+					if add_before then pixel(x + signx, y, kind, ...) end
 					y = y + signy
+					if not add_before then pixel(x, y, kind, ...) end
 				end
 				e = e - 2 * dx
 			end
@@ -94,5 +101,4 @@ return function(world)
 		end
 		pixel(x_2, y_2, kind, ...)
 	end
-
 end

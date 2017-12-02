@@ -1,4 +1,5 @@
 local blocks = require "server.world.blocks"
+local collections = require "shared.collections"
 local decorations = require "server.world.decorations"
 local environment = require "server.world.environment"
 local map = require "shared.config".map
@@ -47,7 +48,16 @@ return function()
 
 		local row = data[x]
 		local current = row[y]
-		if current[1] ~= kind and not blocks[current[1]].overwrite then error("Already a block at " .. x .. ", " .. y, 2) end
+		if current[1] ~= kind and not collections.equal(current[3], args) then
+			local overwrite = blocks[current[1]].overwrite
+			if type(overwrite) == "function" then
+				overwrite = overwrite(current[1], current[3], kind, args)
+			end
+
+			if not overwrite then
+				error("Already a block at " .. x .. ", " .. y, 2)
+			end
+		end
 
 		if block.decorate then
 			current[1] = kind

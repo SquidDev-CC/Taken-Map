@@ -49,8 +49,31 @@ local function copy(table, blacklist, cache)
 	return out
 end
 
+--- Determine whether two collections are equal
+local function equal(a, b)
+	if a == b then return true end
+
+	-- Ensure both objects are tables.
+	if type(a) ~= "table"or type(b) ~= "table" then
+		return false
+	end
+
+	-- Check no keys are missing
+	for k in pairs(a) do
+		if b[k] == nil then return false end
+	end
+
+	-- And check all values are equal
+	for k in pairs(b) do
+		if a[k] ~= b[k] then return false end
+	end
+
+	return true
+end
+
 return {
 	range = range,
 	combine = combine,
 	copy = copy,
+	equal = equal,
 }

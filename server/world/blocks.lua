@@ -45,6 +45,7 @@ return {
 		end,
 		args = getColor,
 		decorate = false,
+		overwrite = function(cb, ca, nb, na) return cb == ca end,
 	},
 	dye = {
 		build = function(x, y, builder, num, col)
