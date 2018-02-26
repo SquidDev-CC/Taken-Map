@@ -32,6 +32,9 @@ return {
 			return height
 		end,
 		decorate = false,
+
+		-- TODO: Implement something more sensible
+		overwrite = function(cb, ca, nb, na) return cb == nb end,
 	},
 	gate = {
 		build = function(x, y, builder, num, col)
@@ -45,7 +48,7 @@ return {
 		end,
 		args = getColor,
 		decorate = false,
-		overwrite = function(cb, ca, nb, na) return cb == ca end,
+		overwrite = function(cb, ca, nb, na) return cb == nb end,
 	},
 	dye = {
 		build = function(x, y, builder, num, col)

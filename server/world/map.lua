@@ -48,14 +48,16 @@ return function()
 
 		local row = data[x]
 		local current = row[y]
-		if current[1] ~= kind and not collections.equal(current[3], args) then
+
+		if current[1] ~= kind or not collections.equal(current[3], args) then
 			local overwrite = blocks[current[1]].overwrite
 			if type(overwrite) == "function" then
 				overwrite = overwrite(current[1], current[3], kind, args)
 			end
 
 			if not overwrite then
-				error("Already a block at " .. x .. ", " .. y, 2)
+				error(string.format("Already have a block at %d, %d (attempting to place %s over %s)",
+				x, y, kind, current[1]), 2)
 			end
 		end
 
